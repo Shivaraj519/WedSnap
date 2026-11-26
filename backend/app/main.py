@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime, date
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends
+from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
@@ -65,6 +66,40 @@ def startup_seed_demo():
         logger.error(f"Startup check failed: {e}")
     finally:
         db.close()
+
+@app.get("/", response_class=HTMLResponse, tags=["Root"])
+def root_info():
+    """Root landing page with direct links to API docs and Frontend Gallery."""
+    return f"""
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>WedSnap API Service</title>
+        <style>
+          body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #FAF8F5; color: #232120; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }}
+          .card {{ background: white; border: 1px solid #EFE7DE; padding: 40px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); text-align: center; max-width: 520px; }}
+          h1 {{ color: #C5A880; font-size: 28px; margin-bottom: 8px; letter-spacing: 2px; }}
+          p {{ color: #686461; font-size: 14px; line-height: 1.6; }}
+          .badge {{ display: inline-block; padding: 4px 12px; background: #E8F5E9; color: #2E7D32; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 20px; }}
+          .btn {{ display: block; margin: 10px 0; padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; transition: 0.2s; }}
+          .btn-primary {{ background: #C5A880; color: white; }}
+          .btn-primary:hover {{ background: #B5966B; }}
+          .btn-secondary {{ background: #F5EFEB; color: #232120; border: 1px solid #EFE7DE; }}
+          .btn-secondary:hover {{ background: #EAE3D9; }}
+        </style>
+      </head>
+      <body>
+        <div class="card">
+          <div class="badge">● WedSnap Cloud Backend Online</div>
+          <h1>WEDSNAP API</h1>
+          <p>Real-time AI-powered wedding photography distribution platform.</p>
+          <a class="btn btn-primary" href="/docs">View Interactive API Documentation (/docs)</a>
+          <a class="btn btn-secondary" href="http://localhost:5173/sophia-alexander" target="_blank">Open Live Wedding Guest Website (Port 5173)</a>
+          <a class="btn btn-secondary" href="/api/health">System Health Check (/api/health)</a>
+        </div>
+      </body>
+    </html>
+    """
 
 @app.get("/api/health", tags=["Health"])
 def health_check():
