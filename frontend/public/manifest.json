@@ -1,0 +1,16 @@
+{
+  "short_name": "WedSnap",
+  "name": "WedSnap — Live Wedding Memories",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "192x192 512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#FAF8F5",
+  "theme_color": "#C5A880",
+  "display": "standalone",
+  "orientation": "portrait"
+}

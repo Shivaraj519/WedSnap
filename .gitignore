@@ -24,10 +24,12 @@ frontend/.vite/
 .gradle/
 build/
 android/.gradle/
+android/.kotlin/
 android/build/
 android/app/build/
 *.apk
 local.properties
+android/local.properties
 
 # OS & Secrets
 .env
