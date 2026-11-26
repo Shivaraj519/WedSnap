@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+backend/venv/
+venv/
+*.db
+storage_data/
+staging_cache/
+incoming_dslr_photos/
+ftp_incoming/
+
+# Node / Vite
+node_modules/
+frontend/node_modules/
+dist/
+frontend/dist/
+.vite/
+frontend/.vite/
+
+# Android
+.gradle/
+build/
+android/.gradle/
+android/build/
+android/app/build/
+*.apk
+local.properties
+
+# OS & Secrets
+.env
+.DS_Store
+Thumbs.db
