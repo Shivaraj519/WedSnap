@@ -101,6 +101,7 @@ def root_info():
     </html>
     """
 
+@app.get("/health", tags=["Health"])
 @app.get("/api/health", tags=["Health"])
 def health_check():
     """Production health check endpoint."""

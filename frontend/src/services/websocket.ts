@@ -24,8 +24,10 @@ export class LiveSyncManager {
   private connect() {
     if (this.isDestroyed) return;
 
-    // Convert http/https to ws/wss
-    const wsBase = API_BASE_URL.replace(/^http/, 'ws');
+    // Convert http/https to ws/wss, or use current window host
+    const wsBase = API_BASE_URL 
+      ? API_BASE_URL.replace(/^http/, 'ws') 
+      : `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}`;
     const wsUrl = `${wsBase}/ws/live/${this.weddingSlugOrId}`;
 
     try {
