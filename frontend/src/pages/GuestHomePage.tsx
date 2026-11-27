@@ -161,131 +161,130 @@ export const GuestHomePage: React.FC<GuestHomePageProps> = ({
       <div className="absolute top-48 right-10 w-[450px] h-[450px] bg-amber-300/15 rounded-full blur-3xl pointer-events-none -z-10 animate-float-slow" />
 
       {/* Editorial Luxury Hero with Blended Couple Photo Backgrounds */}
-      <section className="relative min-h-[92vh] flex items-center justify-center pt-16 pb-20 px-4 text-center overflow-hidden">
+      <section className="relative isolate min-h-[92vh] flex items-center justify-center pt-16 pb-20 px-4 text-center overflow-hidden">
         {/* Full-Bleed Primary Couple Photo in Background */}
-        <div className="absolute inset-0 -z-20 overflow-hidden">
+        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
           <img
             src="/hero_couple.jpg"
             alt="Vinutha B.S. & Mayuresh C.Noola Wedding Backdrop"
-            className="w-full h-full object-cover object-center filter brightness-[0.88] contrast-[1.05] transform scale-105 transition-transform duration-1000 ease-out"
+            className="w-full h-full object-cover object-top opacity-35 filter contrast-110 saturate-110 transform scale-105 transition-transform duration-1000 ease-out"
           />
           {/* Seamless Warm Orange/Amber Luxury Vignette Gradient */}
-          <div className="absolute inset-0 bg-gradient-to-b from-stone-950/60 via-stone-900/30 to-[#F8EFE4]" />
-          <div className="absolute inset-0 bg-radial-gradient from-transparent via-amber-950/20 to-black/60 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#F8EFE4]/60 via-[#F8EFE4]/35 to-[#F8EFE4]" />
         </div>
 
         {/* Left Blended Ambient Photo Panel: Sacred Ritual */}
-        <div className="hidden xl:flex flex-col items-center absolute left-10 top-1/2 -translate-y-1/2 z-10 w-64 p-2 rounded-2xl bg-black/40 backdrop-blur-md border border-amber-300/40 shadow-2xl rotate-[-3deg] hover:rotate-0 hover:scale-105 transition-all duration-500 group animate-float">
+        <div className="hidden xl:flex flex-col items-center absolute left-10 top-1/2 -translate-y-1/2 z-10 w-64 p-2 rounded-2xl bg-stone-900/80 backdrop-blur-md border border-amber-400/40 shadow-2xl rotate-[-3deg] hover:rotate-0 hover:scale-105 transition-all duration-500 group animate-float">
           <div className="w-full h-72 rounded-xl overflow-hidden relative">
             <img
               src="/ceremony_ritual.jpg"
               alt="Sacred Wedding Ritual"
               className="w-full h-full object-cover filter brightness-95 group-hover:brightness-105 group-hover:scale-105 transition-all duration-700"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-transparent" />
             <div className="absolute bottom-3 left-3 right-3 text-left">
-              <span className="text-[10px] tracking-widest uppercase font-semibold text-amber-300">TRADITIONAL RITUAL</span>
+              <span className="text-[10px] tracking-widest uppercase font-bold text-amber-300">TRADITIONAL RITUAL</span>
               <p className="text-xs text-white font-serif italic">Sacred Blessings</p>
             </div>
           </div>
         </div>
 
         {/* Right Blended Ambient Photo Panel: Mandap Celebration */}
-        <div className="hidden xl:flex flex-col items-center absolute right-10 top-1/2 -translate-y-1/2 z-10 w-64 p-2 rounded-2xl bg-black/40 backdrop-blur-md border border-amber-300/40 shadow-2xl rotate-[3deg] hover:rotate-0 hover:scale-105 transition-all duration-500 group animate-float-slow">
+        <div className="hidden xl:flex flex-col items-center absolute right-10 top-1/2 -translate-y-1/2 z-10 w-64 p-2 rounded-2xl bg-stone-900/80 backdrop-blur-md border border-amber-400/40 shadow-2xl rotate-[3deg] hover:rotate-0 hover:scale-105 transition-all duration-500 group animate-float-slow">
           <div className="w-full h-72 rounded-xl overflow-hidden relative">
             <img
               src="/mandap_celebration.jpg"
               alt="Mandap Wedding Ceremony"
               className="w-full h-full object-cover filter brightness-95 group-hover:brightness-105 group-hover:scale-105 transition-all duration-700"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-transparent" />
             <div className="absolute bottom-3 left-3 right-3 text-left">
-              <span className="text-[10px] tracking-widest uppercase font-semibold text-amber-300">MANDAP CEREMONY</span>
+              <span className="text-[10px] tracking-widest uppercase font-bold text-amber-300">MANDAP CEREMONY</span>
               <p className="text-xs text-white font-serif italic">Auspicious Vows</p>
             </div>
           </div>
         </div>
 
-        {/* Frameless Hero Centerpiece - Transparent and Visually Blended */}
+        {/* Frameless Hero Centerpiece - High Contrast & 100% Readable */}
         <div className="relative z-10 max-w-4xl w-full mx-auto space-y-6 px-4">
           {/* Royal Gold Header Crown */}
-          <div className="flex items-center justify-center space-x-3 text-amber-300 drop-shadow-md">
-            <span className="h-[1px] w-12 sm:w-20 bg-gradient-to-r from-transparent via-amber-300 to-transparent" />
-            <span className="text-[11px] sm:text-xs tracking-[0.3em] uppercase font-sans font-semibold text-amber-200 drop-shadow">
+          <div className="flex items-center justify-center space-x-3 text-orange-800">
+            <span className="h-[2px] w-12 sm:w-20 bg-gradient-to-r from-transparent via-orange-600 to-transparent" />
+            <span className="text-xs sm:text-sm tracking-[0.3em] uppercase font-sans font-bold text-orange-950">
               THE WEDDING CELEBRATION OF
             </span>
-            <span className="h-[1px] w-12 sm:w-20 bg-gradient-to-r from-transparent via-amber-300 to-transparent" />
+            <span className="h-[2px] w-12 sm:w-20 bg-gradient-to-r from-transparent via-orange-600 to-transparent" />
           </div>
 
-          {/* Bride & Groom Royal Serif Title */}
-          <h1 className="font-serif text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-normal text-white tracking-wider uppercase leading-tight drop-shadow-[0_4px_16px_rgba(0,0,0,0.9)]">
-            {wedding.bride_name} <span className="text-amber-400 font-light italic font-serif">&</span> {wedding.groom_name}
+          {/* Bride & Groom Bold Dark Royal Title */}
+          <h1 className="font-serif text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-stone-950 tracking-wider uppercase leading-none py-2 drop-shadow-sm">
+            {wedding.bride_name} <span className="text-orange-600 font-light italic font-serif">&</span> {wedding.groom_name}
           </h1>
 
-          {/* Date & Venue Badge */}
-          <div className="inline-block px-5 py-1.5 rounded-full bg-black/40 backdrop-blur-sm border border-amber-300/30 text-amber-100 text-xs sm:text-sm tracking-[0.2em] uppercase font-sans font-medium drop-shadow-md">
+          {/* Date & Venue High-Contrast Badge */}
+          <div className="inline-block px-6 py-2 rounded-full bg-stone-900 text-amber-200 text-xs sm:text-sm tracking-[0.2em] uppercase font-sans font-bold shadow-lg border border-amber-400/40">
             {formattedDate} {wedding.venue && <span>• {wedding.venue}</span>}
           </div>
 
           {/* Mobile Blended Visual Panels (Shown on screens < 1280px) */}
           <div className="xl:hidden flex items-center justify-center gap-3 pt-2">
-            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden border-2 border-amber-300/50 shadow-xl relative">
+            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden border-2 border-stone-800 shadow-xl relative">
               <img src="/ceremony_ritual.jpg" alt="Rituals" className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-1.5">
-                <span className="text-[9px] text-amber-200 font-medium tracking-wider uppercase">Rituals</span>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-1.5">
+                <span className="text-[10px] text-amber-300 font-bold tracking-wider uppercase">Rituals</span>
               </div>
             </div>
-            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden border-2 border-amber-300/50 shadow-xl relative">
+            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden border-2 border-stone-800 shadow-xl relative">
               <img src="/mandap_celebration.jpg" alt="Mandap" className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-1.5">
-                <span className="text-[9px] text-amber-200 font-medium tracking-wider uppercase">Mandap</span>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-1.5">
+                <span className="text-[10px] text-amber-300 font-bold tracking-wider uppercase">Mandap</span>
               </div>
             </div>
           </div>
 
-          {/* Welcome Message */}
+          {/* Welcome Message - High Contrast Crisp Dark Text */}
           {wedding.welcome_message && (
-            <p className="max-w-xl mx-auto text-xs sm:text-sm text-stone-200 leading-relaxed font-sans font-light drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] pt-1">
+            <p className="max-w-2xl mx-auto text-sm sm:text-base text-stone-900 font-medium leading-relaxed font-sans pt-1">
               {wedding.welcome_message}
             </p>
           )}
 
           {/* Primary Call to Action Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-3">
             {wedding.face_search_enabled && (
               <button
                 onClick={() => setIsFindMyPhotosOpen(true)}
-                className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 hover:brightness-110 text-white text-xs font-bold tracking-[0.15em] uppercase shadow-xl shadow-orange-950/40 transition-all transform hover:-translate-y-0.5 flex items-center justify-center space-x-2.5 active:scale-95 border border-amber-300/40"
+                className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-gradient-to-r from-orange-600 via-amber-600 to-orange-700 hover:brightness-110 text-white text-xs font-bold tracking-[0.15em] uppercase shadow-xl shadow-orange-950/20 transition-all transform hover:-translate-y-0.5 flex items-center justify-center space-x-2.5 active:scale-95 border border-amber-300/40"
               >
-                <Sparkles className="w-4 h-4 text-amber-100" />
+                <Sparkles className="w-4 h-4 text-amber-200" />
                 <span>FIND MY PHOTOS (AI FACE RECOGNITION)</span>
               </button>
             )}
 
             <a
               href="#gallery-feed"
-              className="w-full sm:w-auto px-8 py-3.5 rounded-full border border-amber-300/60 bg-black/40 hover:bg-black/60 text-amber-100 hover:text-white text-xs font-semibold tracking-[0.15em] uppercase transition-all shadow-lg backdrop-blur-sm hover:-translate-y-0.5"
+              className="w-full sm:w-auto px-8 py-3.5 rounded-full border-2 border-stone-900 bg-stone-900 hover:bg-stone-800 text-amber-200 hover:text-white text-xs font-bold tracking-[0.15em] uppercase transition-all shadow-lg hover:-translate-y-0.5"
             >
               VIEW LIVE GALLERY ({photos.length})
             </a>
           </div>
 
           {/* Live Synchronizing Pill */}
-          <div className="pt-2 flex items-center justify-center space-x-2 text-[11px] text-amber-200/90 drop-shadow">
+          <div className="pt-2 flex items-center justify-center space-x-2 text-xs text-stone-800 font-semibold">
             <span className="relative flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-600"></span>
             </span>
-            <span className="font-medium tracking-wide">
+            <span className="font-semibold tracking-wide">
               Live Stream Active • DSLR & Mobile Cameras Connected
             </span>
           </div>
 
           {/* Floating Animated Scroll Down Indicator */}
-          <div className="pt-4 flex justify-center">
+          <div className="pt-3 flex justify-center">
             <a
               href="#gallery-feed"
-              className="inline-flex flex-col items-center space-y-1 px-6 py-2 rounded-full bg-black/40 hover:bg-black/60 text-amber-200 hover:text-white text-[11px] font-semibold tracking-widest uppercase transition-all shadow-lg border border-amber-300/30 backdrop-blur-sm animate-bounce-soft group"
+              className="inline-flex flex-col items-center space-y-1 px-6 py-2.5 rounded-full bg-stone-900 hover:bg-stone-800 text-amber-200 hover:text-white text-xs font-bold tracking-widest uppercase transition-all shadow-xl border border-amber-400/30 animate-bounce-soft group"
             >
               <span>SCROLL DOWN TO LIVE STREAM</span>
               <ChevronDown className="w-4 h-4 text-amber-400 group-hover:translate-y-0.5 transition-transform" />
