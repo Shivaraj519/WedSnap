@@ -3,24 +3,58 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
-    background-color: #FAF8F5;
-    color: #232120;
+    background-color: #F8EFE4;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(254, 215, 170, 0.25) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(251, 146, 60, 0.15) 0px, transparent 50%),
+      radial-gradient(at 50% 100%, rgba(253, 186, 116, 0.2) 0px, transparent 50%),
+      linear-gradient(180deg, #FDF9F4 0%, #F8EFE4 40%, #F4E8D7 100%);
+    background-attachment: fixed;
+    color: #262220;
+    min-height: 100vh;
   }
 }
 
-/* Custom editorial scrollbars */
+/* Custom warm orange-beige scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
 }
 ::-webkit-scrollbar-track {
-  background: #FAF8F5;
+  background: #F8EFE4;
 }
 ::-webkit-scrollbar-thumb {
-  background: #EADBC8;
-  border-radius: 3px;
+  background: #E8D4BE;
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #C5A880;
+  background: #D49B5E;
+}
+
+/* Ambient glow and subtle luxury animation effects */
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(229, 138, 78, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(229, 138, 78, 0.45);
+  }
+}
+
+.luxury-glow {
+  animation: pulseGlow 3s ease-in-out infinite;
+}
+
+.shimmer-text {
+  background: linear-gradient(90deg, #262220 0%, #D06B2C 50%, #262220 100%);
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: shimmer 4s linear infinite;
 }

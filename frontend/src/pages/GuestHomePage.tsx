@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { Sparkles, Download, CheckSquare, Square, RefreshCw, AlertCircle, Heart } from 'lucide-react';
+import { Sparkles, Download, CheckSquare, Square, RefreshCw, AlertCircle, Heart, ChevronDown, Camera, Zap } from 'lucide-react';
 import { WeddingPublic, Photo } from '../types';
 import { api } from '../services/api';
 import { LiveSyncManager } from '../services/websocket';
@@ -136,18 +136,18 @@ export const GuestHomePage: React.FC<GuestHomePageProps> = ({
   if (isLoading) {
     return (
       <div className="min-h-[80vh] flex flex-col items-center justify-center space-y-4">
-        <div className="w-10 h-10 border-2 border-champagne border-t-transparent rounded-full animate-spin" />
-        <p className="font-serif text-lg tracking-widest text-charcoal">ENTERING WEDDING GALLERY...</p>
+        <div className="w-12 h-12 border-3 border-orange-500 border-t-transparent rounded-full animate-spin" />
+        <p className="font-serif text-lg tracking-widest text-stone-800">ENTERING WEDDING GALLERY...</p>
       </div>
     );
   }
 
   if (error || !wedding) {
     return (
-      <div className="max-w-md mx-auto my-24 p-8 text-center bg-cream/40 rounded-2xl border border-cream-surface space-y-4">
-        <AlertCircle className="w-10 h-10 text-champagne mx-auto stroke-[1.5]" />
-        <h2 className="font-serif text-2xl text-charcoal">Gallery Not Found</h2>
-        <p className="text-xs text-charcoal-muted leading-relaxed">
+      <div className="max-w-md mx-auto my-24 p-8 text-center bg-[#FAF3EB] rounded-3xl border border-[#E8D4BE] space-y-4 shadow-sm">
+        <AlertCircle className="w-10 h-10 text-orange-600 mx-auto stroke-[1.5]" />
+        <h2 className="font-serif text-2xl text-stone-900">Gallery Not Found</h2>
+        <p className="text-xs text-stone-600 leading-relaxed">
           {error || 'The requested wedding identifier is invalid or has ended.'}
         </p>
       </div>
@@ -155,31 +155,35 @@ export const GuestHomePage: React.FC<GuestHomePageProps> = ({
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Ambient warm orange-beige glow orbs */}
+      <div className="absolute top-10 left-1/4 w-[500px] h-[500px] bg-orange-300/15 rounded-full blur-3xl pointer-events-none -z-10 animate-float" />
+      <div className="absolute top-48 right-10 w-[450px] h-[450px] bg-amber-300/15 rounded-full blur-3xl pointer-events-none -z-10 animate-float-slow" />
+
       {/* Editorial Luxury Hero */}
-      <section className="relative pt-12 pb-16 sm:pt-20 sm:pb-24 px-4 text-center max-w-4xl mx-auto space-y-6">
+      <section className="relative pt-12 pb-14 sm:pt-20 sm:pb-20 px-4 text-center max-w-4xl mx-auto space-y-6">
         {/* Subtle Ornamental Crown */}
-        <div className="flex items-center justify-center space-x-3 text-champagne">
-          <span className="h-[1px] w-12 bg-champagne/40" />
-          <span className="text-xs tracking-[0.25em] uppercase font-sans font-medium text-champagne-accent">
+        <div className="flex items-center justify-center space-x-3 text-orange-700">
+          <span className="h-[1px] w-12 bg-orange-300" />
+          <span className="text-xs tracking-[0.25em] uppercase font-sans font-semibold text-orange-800">
             THE WEDDING CELEBRATION OF
           </span>
-          <span className="h-[1px] w-12 bg-champagne/40" />
+          <span className="h-[1px] w-12 bg-orange-300" />
         </div>
 
-        {/* Bride & Groom Headings */}
-        <h1 className="font-serif text-4xl sm:text-6xl md:text-7xl font-normal text-charcoal tracking-wide uppercase leading-tight">
-          {wedding.bride_name} <span className="text-champagne font-light italic">&</span> {wedding.groom_name}
+        {/* Bride & Groom Headings with subtle gradient shimmer */}
+        <h1 className="font-serif text-4xl sm:text-6xl md:text-7xl font-normal text-stone-900 tracking-wide uppercase leading-tight">
+          {wedding.bride_name} <span className="text-orange-600 font-light italic">&</span> {wedding.groom_name}
         </h1>
 
         {/* Date & Venue */}
-        <div className="text-xs sm:text-sm tracking-[0.18em] uppercase text-charcoal-muted font-sans font-medium">
+        <div className="text-xs sm:text-sm tracking-[0.18em] uppercase text-stone-600 font-sans font-medium">
           {formattedDate} {wedding.venue && <span>• {wedding.venue}</span>}
         </div>
 
         {/* Introduction */}
         {wedding.welcome_message && (
-          <p className="max-w-xl mx-auto text-xs sm:text-sm text-charcoal/80 leading-relaxed font-sans font-normal pt-2">
+          <p className="max-w-xl mx-auto text-xs sm:text-sm text-stone-700 leading-relaxed font-sans font-normal pt-2">
             {wedding.welcome_message}
           </p>
         )}
@@ -189,7 +193,7 @@ export const GuestHomePage: React.FC<GuestHomePageProps> = ({
           {wedding.face_search_enabled && (
             <button
               onClick={() => setIsFindMyPhotosOpen(true)}
-              className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-champagne hover:bg-champagne-hover text-white text-xs font-bold tracking-[0.15em] uppercase shadow-md transition-all transform hover:-translate-y-0.5 flex items-center justify-center space-x-2.5"
+              className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 hover:brightness-105 text-white text-xs font-bold tracking-[0.15em] uppercase shadow-lg shadow-orange-500/20 transition-all transform hover:-translate-y-0.5 flex items-center justify-center space-x-2.5 active:scale-95"
             >
               <Sparkles className="w-4 h-4" />
               <span>FIND MY PHOTOS</span>
@@ -198,33 +202,44 @@ export const GuestHomePage: React.FC<GuestHomePageProps> = ({
 
           <a
             href="#gallery-feed"
-            className="w-full sm:w-auto px-8 py-3.5 rounded-full border border-champagne text-charcoal hover:bg-cream-surface text-xs font-semibold tracking-[0.15em] uppercase transition-all"
+            className="w-full sm:w-auto px-8 py-3.5 rounded-full border border-orange-400 bg-white/80 hover:bg-white text-stone-900 text-xs font-semibold tracking-[0.15em] uppercase transition-all shadow-sm hover:-translate-y-0.5"
           >
             VIEW LIVE GALLERY ({photos.length})
           </a>
         </div>
 
         {/* Live Synchronizing Pill */}
-        <div className="pt-4 flex items-center justify-center space-x-2 text-[11px] text-charcoal-muted">
+        <div className="pt-2 flex items-center justify-center space-x-2 text-[11px] text-stone-600">
           <span className="relative flex h-2.5 w-2.5">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
           </span>
           <span className="font-medium tracking-wide">
-            Live Stream Active • DSLRs & Mobile Cameras Connected
+            Live Stream Active • DSLRs, HDMI & Mobile Cameras Connected
           </span>
+        </div>
+
+        {/* Floating Animated Scroll Down Indicator */}
+        <div className="pt-8 flex justify-center">
+          <a
+            href="#gallery-feed"
+            className="inline-flex flex-col items-center space-y-1.5 px-5 py-2.5 rounded-full bg-white/80 hover:bg-white text-stone-700 hover:text-orange-700 text-[11px] font-semibold tracking-widest uppercase transition-all shadow-md border border-[#E8D4BE] animate-bounce-soft group"
+          >
+            <span>SCROLL DOWN TO LIVE GALLERY</span>
+            <ChevronDown className="w-4 h-4 text-orange-600 group-hover:translate-y-0.5 transition-transform" />
+          </a>
         </div>
       </section>
 
       {/* Main Live Gallery Section */}
       <section id="gallery-feed" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-20">
         {/* Gallery Control Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-cream-surface">
+        <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-[#E8D4BE]">
           <div>
-            <h2 className="font-serif text-2xl sm:text-3xl font-normal text-charcoal">
+            <h2 className="font-serif text-2xl sm:text-3xl font-normal text-stone-900">
               Live Wedding Gallery
             </h2>
-            <p className="text-xs text-charcoal-muted mt-0.5">
+            <p className="text-xs text-stone-600 mt-0.5">
               Showing newest photographs first • Preserved in original HD resolution
             </p>
           </div>
@@ -233,12 +248,12 @@ export const GuestHomePage: React.FC<GuestHomePageProps> = ({
             {photos.length > 0 && (
               <button
                 onClick={handleSelectAll}
-                className="px-3.5 py-1.5 rounded-full border border-cream-surface hover:border-champagne text-charcoal text-xs font-medium flex items-center space-x-1.5 transition"
+                className="px-3.5 py-1.5 rounded-full border border-[#E8D4BE] bg-white hover:border-orange-400 text-stone-800 text-xs font-medium flex items-center space-x-1.5 transition shadow-sm"
               >
                 {selectedPhotoIds.size === photos.length ? (
-                  <CheckSquare className="w-3.5 h-3.5 text-champagne" />
+                  <CheckSquare className="w-3.5 h-3.5 text-orange-600" />
                 ) : (
-                  <Square className="w-3.5 h-3.5 text-charcoal-muted" />
+                  <Square className="w-3.5 h-3.5 text-stone-400" />
                 )}
                 <span>
                   {selectedPhotoIds.size === photos.length ? 'Deselect All' : 'Select All'}
@@ -250,7 +265,7 @@ export const GuestHomePage: React.FC<GuestHomePageProps> = ({
               <button
                 onClick={handleBatchDownload}
                 disabled={isBatchDownloading}
-                className="px-4 py-1.5 rounded-full bg-champagne text-white text-xs font-semibold tracking-wider flex items-center space-x-1.5 transition shadow"
+                className="px-4 py-1.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:brightness-105 text-white text-xs font-semibold tracking-wider flex items-center space-x-1.5 transition shadow"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>
@@ -266,12 +281,12 @@ export const GuestHomePage: React.FC<GuestHomePageProps> = ({
         {/* Photos Grid */}
         {photos.length === 0 ? (
           <div className="py-24 text-center space-y-4 max-w-md mx-auto">
-            <div className="w-16 h-16 rounded-full bg-cream-surface flex items-center justify-center text-champagne mx-auto">
+            <div className="w-16 h-16 rounded-full bg-white border border-[#E8D4BE] flex items-center justify-center text-orange-600 mx-auto shadow-sm">
               <RefreshCw className="w-6 h-6 animate-spin" />
             </div>
-            <h3 className="font-serif text-xl text-charcoal">Awaiting First Captures</h3>
-            <p className="text-xs text-charcoal-muted leading-relaxed">
-              Photographers are currently shooting. Newly captured photos from mobile cameras and tethered DSLRs will automatically stream to this screen without needing a page refresh.
+            <h3 className="font-serif text-xl text-stone-900">Awaiting First Captures</h3>
+            <p className="text-xs text-stone-600 leading-relaxed">
+              Photographers are currently shooting. Newly captured photos from mobile cameras, HDMI live view, and tethered DSLRs will automatically stream to this screen without needing a page refresh.
             </p>
           </div>
         ) : (

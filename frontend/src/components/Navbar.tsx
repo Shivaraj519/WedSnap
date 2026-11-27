@@ -16,18 +16,18 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenQR,
 }) => {
   return (
-    <header className="sticky top-0 z-40 bg-ivory/90 backdrop-blur-md border-b border-cream-surface/60 transition-all">
+    <header className="sticky top-0 z-40 bg-[#FAF3EB]/90 backdrop-blur-md border-b border-[#E8D4BE] shadow-xs transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
         {/* Brand Monogram */}
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-full border border-champagne flex items-center justify-center text-champagne bg-ivory-light shadow-sm">
+        <div className="flex items-center space-x-3.5">
+          <div className="w-11 h-11 rounded-2xl border border-orange-300 flex items-center justify-center text-orange-700 bg-white shadow-sm">
             <Camera className="w-5 h-5 stroke-[1.5]" />
           </div>
           <div>
-            <span className="font-serif text-2xl tracking-[0.2em] font-medium text-charcoal block leading-none">
+            <span className="font-serif text-2xl tracking-[0.2em] font-medium text-stone-900 block leading-none">
               WEDSNAP
             </span>
-            <span className="text-[10px] tracking-[0.18em] uppercase text-champagne-accent font-sans block mt-1">
+            <span className="text-[10px] tracking-[0.18em] uppercase text-orange-700 font-sans font-semibold block mt-1">
               Live Wedding Memories
             </span>
           </div>
@@ -38,10 +38,10 @@ export const Navbar: React.FC<NavbarProps> = ({
           {wedding && onOpenQR && (
             <button
               onClick={onOpenQR}
-              className="p-2 sm:px-3 sm:py-2 rounded-full border border-champagne/40 hover:border-champagne text-charcoal hover:text-champagne-accent transition text-xs font-medium flex items-center space-x-1.5"
+              className="p-2 sm:px-3 sm:py-2 rounded-full border border-[#D5A47D] bg-white/80 hover:bg-white text-stone-800 hover:text-orange-800 transition text-xs font-semibold flex items-center space-x-1.5 shadow-sm"
               title="View Wedding QR Code"
             >
-              <QrCode className="w-4 h-4 text-champagne" />
+              <QrCode className="w-4 h-4 text-orange-600" />
               <span className="hidden sm:inline">QR Code</span>
             </button>
           )}
@@ -49,7 +49,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {wedding && wedding.face_search_enabled && onOpenFindMyPhotos && (
             <button
               onClick={onOpenFindMyPhotos}
-              className="px-4 py-2 rounded-full bg-champagne text-white hover:bg-champagne-hover transition-all text-xs sm:text-sm font-medium tracking-wide shadow-sm flex items-center space-x-2"
+              className="px-4 py-2 rounded-full bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 text-white hover:brightness-105 transition-all text-xs sm:text-sm font-semibold tracking-wide shadow-md flex items-center space-x-2 hover:scale-105 active:scale-95"
             >
               <Sparkles className="w-4 h-4" />
               <span>Find My Photos</span>
@@ -59,8 +59,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           {onOpenAdmin && (
             <button
               onClick={onOpenAdmin}
-              className="p-2 text-charcoal-muted hover:text-charcoal transition"
-              title="Admin Portal"
+              className="p-2.5 rounded-xl border border-transparent hover:border-[#E8D4BE] hover:bg-white/60 text-stone-600 hover:text-stone-900 transition"
+              title="Admin & Camera Portal"
             >
               <Shield className="w-4 h-4" />
             </button>
