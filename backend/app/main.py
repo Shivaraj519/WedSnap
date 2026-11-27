@@ -42,27 +42,35 @@ app.include_router(api_router, prefix=settings.API_V1_STR)
 
 @app.on_event("startup")
 def startup_seed_demo():
-    """Ensure a demonstration wedding exists on first launch for seamless testing."""
+    """Ensure Vinutha B.S. & Mayuresh C.Noola wedding exists for seamless live testing."""
     db = next(get_db())
     try:
-        existing = db.query(Wedding).filter(Wedding.slug == "sophia-alexander").first()
-        if not existing:
-            demo_wedding = Wedding(
+        # 1. Update or create wedding with Vinutha B.S. and Mayuresh C.Noola
+        wedding = db.query(Wedding).filter(Wedding.slug.in_(["vinutha-mayuresh", "sophia-alexander"])).first()
+        if not wedding:
+            wedding = Wedding(
                 id="wds-demo-wedding-001",
-                slug="sophia-alexander",
-                bride_name="Sophia",
-                groom_name="Alexander",
+                slug="vinutha-mayuresh",
+                bride_name="Vinutha B.S.",
+                groom_name="Mayuresh C.Noola",
                 wedding_date=date(2026, 11, 28),
-                venue="Villa d'Este, Lake Como",
-                welcome_message="Welcome to our wedding! Every candid moment captured by our photographers is streamed directly here in real-time. Scan or browse below to find your photos.",
+                venue="Palace Grounds, Bangalore",
+                welcome_message="Welcome to our wedding celebration! Every precious candid moment captured by our photographers is streamed directly here in real-time. Scan or browse below to find your photos.",
                 gallery_status="active",
                 face_search_enabled=True,
                 allow_original_downloads=True,
                 admin_password_hash=hash_password("wedding2026")
             )
-            db.add(demo_wedding)
+            db.add(wedding)
             db.commit()
-            logger.info("Demo wedding 'sophia-alexander' initialized (admin passcode: wedding2026)")
+            logger.info("Wedding 'vinutha-mayuresh' initialized (admin passcode: wedding2026)")
+        else:
+            wedding.bride_name = "Vinutha B.S."
+            wedding.groom_name = "Mayuresh C.Noola"
+            if not wedding.venue or "Villa d'Este" in wedding.venue:
+                wedding.venue = "Palace Grounds, Bangalore"
+            db.commit()
+            logger.info("Wedding names updated to Vinutha B.S. & Mayuresh C.Noola")
     except Exception as e:
         logger.error(f"Startup check failed: {e}")
     finally:

@@ -7,7 +7,7 @@ import { WeddingPublic } from './types';
 import { api } from './services/api';
 
 export function App() {
-  const [weddingSlug, setWeddingSlug] = useState<string>('sophia-alexander');
+  const [weddingSlug, setWeddingSlug] = useState<string>('vinutha-mayuresh');
   const [isAdminView, setIsAdminView] = useState(false);
   const [wedding, setWedding] = useState<WeddingPublic | null>(null);
 
