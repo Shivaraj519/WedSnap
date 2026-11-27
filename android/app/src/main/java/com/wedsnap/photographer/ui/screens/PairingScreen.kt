@@ -18,6 +18,11 @@ import com.wedsnap.photographer.ui.theme.ChampagneGold
 import com.wedsnap.photographer.ui.theme.DarkCharcoal
 import com.wedsnap.photographer.ui.theme.WarmIvory
 
+import com.wedsnap.photographer.data.local.WedSnapDatabase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PairingScreen(onPaired: () -> Unit) {
@@ -107,6 +112,11 @@ fun PairingScreen(onPaired: () -> Unit) {
                             .putString("device_token", deviceToken.trim())
                             .putBoolean("is_paired", true)
                             .apply()
+                        CoroutineScope(Dispatchers.IO).launch {
+                            try {
+                                WedSnapDatabase.getDatabase(context).photoDao().clearAll()
+                            } catch (_: Exception) {}
+                        }
                         onPaired()
                     },
                     modifier = Modifier

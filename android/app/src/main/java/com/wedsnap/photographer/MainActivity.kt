@@ -16,6 +16,11 @@ import com.wedsnap.photographer.ui.screens.PairingScreen
 import com.wedsnap.photographer.ui.screens.StatusScreen
 import com.wedsnap.photographer.ui.theme.WedSnapTheme
 
+import com.wedsnap.photographer.data.local.WedSnapDatabase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
 class MainActivity : ComponentActivity() {
 
     private val requestPermissionsLauncher = registerForActivityResult(
@@ -31,9 +36,19 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         requestRequiredPermissions()
 
+        // Clear any old accumulated counters from previous tests so session starts fresh
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        if (!prefs.getBoolean("clean_session_v5", false)) {
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    WedSnapDatabase.getDatabase(applicationContext).photoDao().clearAll()
+                } catch (_: Exception) {}
+            }
+            prefs.edit().putBoolean("clean_session_v5", true).apply()
+        }
+
         setContent {
             WedSnapTheme {
-                val prefs = remember { PreferenceManager.getDefaultSharedPreferences(this) }
                 var isPaired by remember { mutableStateOf(prefs.getBoolean("is_paired", false)) }
 
                 if (isPaired) {
@@ -41,6 +56,11 @@ class MainActivity : ComponentActivity() {
                         onUnpair = {
                             stopService(Intent(this, MediaObserverService::class.java))
                             prefs.edit().putBoolean("is_paired", false).apply()
+                            CoroutineScope(Dispatchers.IO).launch {
+                                try {
+                                    WedSnapDatabase.getDatabase(applicationContext).photoDao().clearAll()
+                                } catch (_: Exception) {}
+                            }
                             isPaired = false
                         }
                     )

@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.CloudDone
 import androidx.compose.material.icons.filled.CloudSync
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -27,6 +28,9 @@ import com.wedsnap.photographer.service.MediaObserverService
 import com.wedsnap.photographer.ui.theme.ChampagneGold
 import com.wedsnap.photographer.ui.theme.DarkCharcoal
 import com.wedsnap.photographer.ui.theme.WarmIvory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun StatusScreen(onUnpair: () -> Unit) {
@@ -136,6 +140,33 @@ fun StatusScreen(onUnpair: () -> Unit) {
                         color = DarkCharcoal.copy(alpha = 0.7f),
                         letterSpacing = 1.sp
                     )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    TextButton(
+                        onClick = {
+                            CoroutineScope(Dispatchers.IO).launch {
+                                try {
+                                    db.photoDao().clearAll()
+                                } catch (_: Exception) {}
+                            }
+                        },
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = "Reset Counter",
+                            tint = ChampagneGold,
+                            modifier = Modifier.size(14.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "Reset Counter to 0",
+                            color = ChampagneGold,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
                 }
             }
         }

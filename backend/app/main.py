@@ -90,29 +90,6 @@ async def startup_seed_demo():
             db.add(dev)
             db.commit()
             logger.info("Default photographer Android phone seeded with active token")
-
-        # 3. Seed genuine wedding photographs so the gallery is never wiped on cloud restarts
-        photo_count = db.query(Photo).filter(Photo.wedding_id == wedding.id).count()
-        if photo_count == 0:
-            seed_dir = os.path.join(os.path.dirname(__file__), "seed_photos")
-            if os.path.exists(seed_dir):
-                for fname in sorted(os.listdir(seed_dir)):
-                    fpath = os.path.join(seed_dir, fname)
-                    if os.path.isfile(fpath) and fname.lower().endswith(('.jpg', '.jpeg', '.png')):
-                        with open(fpath, "rb") as f:
-                            data = f.read()
-                        try:
-                            await upload_service.process_and_store_photo(
-                                db=db,
-                                wedding_id=wedding.id,
-                                file_bytes=data,
-                                filename=fname,
-                                mime_type="image/jpeg",
-                                source_device_id=dev.id if dev else None
-                            )
-                            logger.info(f"Permanently seeded wedding photograph: {fname}")
-                        except Exception as p_err:
-                            logger.warning(f"Could not seed photo {fname}: {p_err}")
     except Exception as e:
         logger.error(f"Startup check failed: {e}")
     finally:
