@@ -63,7 +63,7 @@ class WeddingResponse(WeddingPublic):
 class DeviceRegisterRequest(BaseModel):
     wedding_id_or_slug: str
     device_name: str = Field(..., example="Sony A7 IV - Primary")
-    device_type: str = Field("dslr_folder", example="dslr_folder") # 'android_direct', 'usb_adb', 'dslr_folder', 'dslr_ftp'
+    device_type: str = Field("hdmi_capture", example="hdmi_capture") # 'hdmi_capture', 'android_direct', 'usb_adb', 'dslr_folder', 'dslr_ftp'
 
 class DeviceRegisterResponse(BaseModel):
     device_id: str

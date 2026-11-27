@@ -169,6 +169,36 @@ class ApiService {
     });
     if (!res.ok) throw new Error('Failed to purge biometric records');
   }
+
+  // --- Photo Upload API (Unified for Web HDMI Shutter, Manual, and Devices) ---
+  async uploadPhoto(
+    weddingSlugOrId: string,
+    file: Blob | File,
+    filename: string,
+    options?: { token?: string; deviceToken?: string }
+  ): Promise<Photo> {
+    const formData = new FormData();
+    formData.append('file', file, filename);
+    formData.append('wedding_id_or_slug', weddingSlugOrId);
+
+    const headers: Record<string, string> = {};
+    if (options?.deviceToken) {
+      headers['X-Device-Token'] = options.deviceToken;
+    } else if (options?.token) {
+      headers['Authorization'] = `Bearer ${options.token}`;
+    }
+
+    const res = await fetch(`${API_BASE_URL}/api/v1/photos/upload`, {
+      method: 'POST',
+      headers,
+      body: formData,
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || 'Photo upload failed');
+    }
+    return res.json();
+  }
 }
 
 export const api = new ApiService();

@@ -46,7 +46,7 @@ class Device(Base):
     id = Column(String(36), primary_key=True, default=generate_uuid)
     wedding_id = Column(String(36), ForeignKey("weddings.id", ondelete="CASCADE"), nullable=False, index=True)
     device_name = Column(String(150), nullable=False)
-    device_type = Column(String(50), nullable=False) # 'android_direct', 'usb_adb', 'dslr_folder', 'dslr_ftp', 'manual_web'
+    device_type = Column(String(50), nullable=False) # 'hdmi_capture', 'android_direct', 'usb_adb', 'dslr_folder', 'dslr_ftp', 'manual_web'
     api_token_hash = Column(String(255), unique=True, nullable=False, index=True)
     authentication_status = Column(String(20), nullable=False, default="active") # active, revoked
     last_ip = Column(String(64), nullable=True)

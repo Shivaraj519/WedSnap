@@ -17,10 +17,21 @@ import {
   Download,
   Users,
   Image as ImageIcon,
-  ArrowLeft
+  ArrowLeft,
+  Zap,
+  Radio,
+  Wifi,
+  Usb,
+  Video,
+  Sliders,
+  CheckCircle2,
+  ExternalLink,
+  ChevronRight,
+  Eye
 } from 'lucide-react';
 import { WeddingAdmin, Device, Photo, AnalyticsSummary } from '../types';
 import { api } from '../services/api';
+import { HdmiViewfinder } from '../components/HdmiViewfinder';
 
 interface AdminDashboardPageProps {
   weddingSlug: string;
@@ -42,12 +53,12 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [analytics, setAnalytics] = useState<AnalyticsSummary | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'devices' | 'photos' | 'privacy'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'hdmi' | 'devices' | 'photos' | 'privacy'>('overview');
 
   // New Device Registration Dialog
   const [isRegisteringDevice, setIsRegisteringDevice] = useState(false);
   const [newDeviceName, setNewDeviceName] = useState('');
-  const [newDeviceType, setNewDeviceType] = useState('dslr_folder');
+  const [newDeviceType, setNewDeviceType] = useState<'hdmi_capture' | 'dslr_folder' | 'dslr_ftp' | 'android_direct' | 'usb_adb'>('hdmi_capture');
   const [newlyCreatedToken, setNewlyCreatedToken] = useState<string | null>(null);
   const [copiedToken, setCopiedToken] = useState(false);
 
@@ -86,7 +97,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
     e.preventDefault();
     setLoginError(null);
     try {
-      const resp = await api.adminLogin(weddingSlug, passwordInput);
+      const resp = await api.adminLogin(weddingSlug, passwordInput.trim());
       setToken(resp.access_token);
       localStorage.setItem(`admin_token_${weddingSlug}`, resp.access_token);
       loadDashboardData(resp.access_token);
@@ -103,7 +114,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
   const handleRegisterDevice = async () => {
     if (!newDeviceName.trim()) return;
     try {
-      const resp = await api.registerDevice(weddingSlug, newDeviceName, newDeviceType);
+      const resp = await api.registerDevice(weddingSlug, newDeviceName.trim(), newDeviceType);
       setNewlyCreatedToken(resp.api_token);
       if (token) {
         const dData = await api.listDevices(token);
@@ -167,43 +178,104 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
     }
   };
 
-  // Login View
+  // Connection Options for Device Pairing
+  const connectionOptions = [
+    {
+      id: 'hdmi_capture',
+      title: 'HDMI Video Capture Card',
+      subtitle: 'Clean HDMI cable via Cam Link / USB Capture Card',
+      badge: 'Zero-Latency Clean Feed',
+      badgeColor: 'bg-amber-100 text-amber-800 border-amber-300',
+      icon: <Zap className="w-5 h-5 text-amber-600" />,
+      description: 'Stream uncompressed full HD/4K stills straight from camera HDMI into WedSnap live browser viewfinder and instant shutter.',
+      recommended: true,
+    },
+    {
+      id: 'dslr_folder',
+      title: 'DSLR Folder Monitor',
+      subtitle: 'Canon EOS Utility / Sony Imaging Edge / Nikon NX Tether',
+      badge: 'Hot Folder Watcher',
+      badgeColor: 'bg-stone-100 text-stone-800 border-stone-300',
+      icon: <Camera className="w-5 h-5 text-stone-700" />,
+      description: 'Monitors the laptop folder where camera tethering software saves photos; automatically uploads upon write completion.',
+    },
+    {
+      id: 'dslr_ftp',
+      title: 'DSLR Wi-Fi FTP Direct',
+      subtitle: 'Direct camera-to-cloud Wi-Fi FTP transmission',
+      badge: 'Port 2121 Wireless',
+      badgeColor: 'bg-sky-100 text-sky-800 border-sky-300',
+      icon: <Wifi className="w-5 h-5 text-sky-600" />,
+      description: 'Zero cables. Configure your camera Wi-Fi to send every shutter click wirelessly to WedSnap FTP server on port 2121.',
+    },
+    {
+      id: 'android_direct',
+      title: 'Android Mobile Application',
+      subtitle: 'WedSnap Native Android Background Service',
+      badge: 'Direct Cloud Observer',
+      badgeColor: 'bg-emerald-100 text-emerald-800 border-emerald-300',
+      icon: <Smartphone className="w-5 h-5 text-emerald-600" />,
+      description: 'Monitors phone camera gallery in background and auto-uploads every photo in real-time.',
+    },
+    {
+      id: 'usb_adb',
+      title: 'USB Laptop ADB Connector',
+      subtitle: 'Wired Android tether via high-speed USB bridge',
+      badge: 'Wired ADB Tether',
+      badgeColor: 'bg-purple-100 text-purple-800 border-purple-300',
+      icon: <Usb className="w-5 h-5 text-purple-600" />,
+      description: 'Direct wired phone connection for venues with zero cellular reception or high-density Wi-Fi interference.',
+    },
+  ];
+
+  // 1. Login View
   if (!token) {
     return (
       <div className="min-h-[85vh] flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-ivory border border-cream-surface rounded-2xl p-8 shadow-xl text-center space-y-6">
-          <div className="w-12 h-12 rounded-full bg-champagne-light text-champagne-accent flex items-center justify-center mx-auto">
-            <Lock className="w-6 h-6 stroke-[1.5]" />
+        <div className="max-w-md w-full bg-white/95 backdrop-blur-xl border border-stone-200 rounded-3xl p-8 sm:p-10 shadow-2xl text-center space-y-6">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-champagne-light to-[#E5D7C5] text-stone-900 flex items-center justify-center mx-auto shadow-inner border border-champagne/40">
+            <Lock className="w-7 h-7 stroke-[1.5]" />
           </div>
 
-          <div>
-            <h2 className="font-serif text-2xl font-medium text-charcoal">Photographer & Admin Portal</h2>
-            <p className="text-xs text-charcoal-muted mt-1">
-              Enter wedding administration passcode for '{weddingSlug}'
+          <div className="space-y-1.5">
+            <span className="text-[10px] uppercase font-bold tracking-widest text-champagne-accent">Admin Security Gate</span>
+            <h2 className="font-serif text-3xl font-normal text-stone-900">Photographer Portal</h2>
+            <p className="text-xs text-stone-600">
+              Enter administration passcode for <strong className="text-stone-900">{weddingSlug}</strong>
             </p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-4">
-            <input
-              type="password"
-              placeholder="Admin Passcode"
-              value={passwordInput}
-              onChange={(e) => setPasswordInput(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-cream-surface bg-cream/30 text-charcoal text-center text-sm tracking-wider focus:outline-none focus:border-champagne"
-              required
-            />
+          <form onSubmit={handleLogin} className="space-y-4 text-left">
+            <div>
+              <label className="text-[11px] font-semibold text-stone-700 block mb-1.5 tracking-wide">
+                Admin Passcode
+              </label>
+              <input
+                type="password"
+                placeholder="Enter passcode (e.g. wedding2026)"
+                value={passwordInput}
+                onChange={(e) => setPasswordInput(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl border border-stone-200 bg-stone-50 text-stone-900 text-sm tracking-wider focus:outline-none focus:ring-2 focus:ring-champagne focus:bg-white transition"
+                required
+              />
+            </div>
 
-            {loginError && <p className="text-xs text-red-600">{loginError}</p>}
+            {loginError && (
+              <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 flex items-center space-x-2">
+                <AlertTriangle className="w-4 h-4 text-red-500 shrink-0" />
+                <span>{loginError}</span>
+              </div>
+            )}
 
             <button
               type="submit"
-              className="w-full py-3 rounded-xl bg-champagne hover:bg-champagne-hover text-white text-xs font-bold tracking-widest uppercase transition shadow"
+              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#D4AF37] via-[#C5A880] to-[#B5966B] hover:brightness-105 text-stone-950 text-xs font-bold tracking-widest uppercase transition shadow-lg active:scale-95"
             >
               ACCESS DASHBOARD
             </button>
           </form>
 
-          <button onClick={onExit} className="text-xs text-charcoal-muted hover:text-charcoal underline">
+          <button onClick={onExit} className="text-xs text-stone-600 hover:text-stone-900 underline font-medium">
             Return to Public Wedding Gallery
           </button>
         </div>
@@ -211,113 +283,293 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
     );
   }
 
+  // 2. Main Admin Dashboard
   return (
     <div className="min-h-screen max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      {/* Top Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-cream-surface pb-6">
-        <div>
-          <button
-            onClick={onExit}
-            className="text-xs text-champagne hover:text-champagne-accent font-medium flex items-center space-x-1 mb-2"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>View Public Gallery</span>
-          </button>
-          <h1 className="font-serif text-3xl font-medium text-charcoal">
-            {wedding?.bride_name} & {wedding?.groom_name} — Admin
+      {/* Top Header & Cloud Status Bar */}
+      <div className="bg-white/80 backdrop-blur-md rounded-3xl p-6 sm:p-8 border border-stone-200 shadow-sm flex flex-wrap items-center justify-between gap-6">
+        <div className="space-y-2">
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={onExit}
+              className="text-xs text-stone-600 hover:text-stone-950 font-medium flex items-center space-x-1 transition"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Public Gallery</span>
+            </button>
+            <span className="text-stone-300">|</span>
+            <div className="flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-semibold tracking-wider">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span>RENDER CLOUD ONLINE</span>
+            </div>
+          </div>
+
+          <h1 className="font-serif text-3xl sm:text-4xl font-normal text-stone-900">
+            {wedding?.bride_name} & {wedding?.groom_name}
           </h1>
-          <p className="text-xs text-charcoal-muted">WedSnap Live Tethering & Multi-Camera Management</p>
+          <p className="text-xs text-stone-600">
+            WedSnap Multi-Camera Hub &bull; HDMI Live Viewfinder &bull; DSLR Tethering &bull; Mobile Observer
+          </p>
         </div>
 
-        <div className="flex items-center space-x-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            onClick={() => setActiveTab('hdmi')}
+            className="px-4 py-2.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-bold text-xs tracking-wider uppercase hover:brightness-105 transition flex items-center space-x-2 shadow"
+          >
+            <Zap className="w-4 h-4 fill-current" />
+            <span>OPEN HDMI LIVE VIEWFINDER</span>
+          </button>
+
           <a
             href={api.getTableCardUrl(weddingSlug)}
             download={`WedSnap_Table_Card_${weddingSlug}.jpg`}
-            className="px-4 py-2 rounded-full border border-champagne text-charcoal text-xs font-medium hover:bg-cream-surface transition flex items-center space-x-1.5"
+            className="px-4 py-2.5 rounded-full border border-stone-300 hover:border-stone-400 bg-white text-stone-800 text-xs font-semibold hover:bg-stone-50 transition flex items-center space-x-2 shadow-sm"
           >
-            <Printer className="w-4 h-4 text-champagne" />
-            <span>Printable Table Card</span>
+            <Printer className="w-4 h-4 text-stone-600" />
+            <span>Table Cards</span>
           </a>
 
           <button
             onClick={handleLogout}
-            className="px-4 py-2 rounded-full bg-cream-surface hover:bg-cream text-charcoal text-xs font-medium transition"
+            className="px-4 py-2.5 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-medium transition"
           >
             Sign Out
           </button>
         </div>
       </div>
 
-      {/* Analytics Summary Cards */}
+      {/* Analytics Summary Metric Tiles */}
       {analytics && (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-          <div className="p-5 rounded-xl bg-cream/40 border border-cream-surface">
-            <div className="flex items-center space-x-2 text-charcoal-muted text-xs">
+          <div className="p-5 rounded-2xl bg-white border border-stone-200 shadow-sm hover:border-champagne/60 transition">
+            <div className="flex items-center space-x-2 text-stone-500 text-xs font-medium">
               <ImageIcon className="w-4 h-4 text-champagne" />
               <span>TOTAL PHOTOS</span>
             </div>
-            <p className="text-3xl font-serif text-charcoal font-semibold mt-2">{analytics.total_photos}</p>
+            <p className="text-3xl font-serif text-stone-900 font-medium mt-2">{analytics.total_photos}</p>
           </div>
 
-          <div className="p-5 rounded-xl bg-cream/40 border border-cream-surface">
-            <div className="flex items-center space-x-2 text-charcoal-muted text-xs">
+          <div className="p-5 rounded-2xl bg-white border border-stone-200 shadow-sm hover:border-champagne/60 transition">
+            <div className="flex items-center space-x-2 text-stone-500 text-xs font-medium">
               <Download className="w-4 h-4 text-champagne" />
               <span>GUEST DOWNLOADS</span>
             </div>
-            <p className="text-3xl font-serif text-charcoal font-semibold mt-2">{analytics.total_downloads}</p>
+            <p className="text-3xl font-serif text-stone-900 font-medium mt-2">{analytics.total_downloads}</p>
           </div>
 
-          <div className="p-5 rounded-xl bg-cream/40 border border-cream-surface">
-            <div className="flex items-center space-x-2 text-charcoal-muted text-xs">
+          <div className="p-5 rounded-2xl bg-white border border-stone-200 shadow-sm hover:border-champagne/60 transition">
+            <div className="flex items-center space-x-2 text-stone-500 text-xs font-medium">
               <HardDrive className="w-4 h-4 text-champagne" />
               <span>STORAGE USED</span>
             </div>
-            <p className="text-3xl font-serif text-charcoal font-semibold mt-2">{analytics.storage_mb} MB</p>
+            <p className="text-3xl font-serif text-stone-900 font-medium mt-2">{analytics.storage_mb} MB</p>
           </div>
 
-          <div className="p-5 rounded-xl bg-cream/40 border border-cream-surface">
-            <div className="flex items-center space-x-2 text-charcoal-muted text-xs">
+          <div className="p-5 rounded-2xl bg-white border border-stone-200 shadow-sm hover:border-champagne/60 transition">
+            <div className="flex items-center space-x-2 text-stone-500 text-xs font-medium">
               <Camera className="w-4 h-4 text-champagne" />
               <span>ACTIVE CAMERAS</span>
             </div>
-            <p className="text-3xl font-serif text-charcoal font-semibold mt-2">{analytics.active_devices}</p>
+            <p className="text-3xl font-serif text-stone-900 font-medium mt-2">{analytics.active_devices}</p>
           </div>
 
-          <div className="p-5 rounded-xl bg-cream/40 border border-cream-surface">
-            <div className="flex items-center space-x-2 text-charcoal-muted text-xs">
+          <div className="p-5 rounded-2xl bg-white border border-stone-200 shadow-sm hover:border-champagne/60 transition">
+            <div className="flex items-center space-x-2 text-stone-500 text-xs font-medium">
               <Sparkles className="w-4 h-4 text-champagne" />
               <span>FACES INDEXED</span>
             </div>
-            <p className="text-3xl font-serif text-charcoal font-semibold mt-2">{analytics.faces_indexed}</p>
+            <p className="text-3xl font-serif text-stone-900 font-medium mt-2">{analytics.faces_indexed}</p>
           </div>
         </div>
       )}
 
-      {/* Tabs */}
-      <div className="flex border-b border-cream-surface space-x-8 text-sm">
-        {(['overview', 'devices', 'photos', 'privacy'] as const).map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`pb-3 font-serif tracking-wider capitalize text-base transition ${
-              activeTab === tab
-                ? 'border-b-2 border-champagne text-charcoal font-medium'
-                : 'text-charcoal-muted hover:text-charcoal'
-            }`}
-          >
-            {tab === 'devices' ? `Camera Devices (${devices.length})` : tab}
-          </button>
-        ))}
+      {/* Elevated Luxury Navigation Tabs */}
+      <div className="flex border-b border-stone-200 space-x-2 sm:space-x-8 text-sm overflow-x-auto no-scrollbar">
+        <button
+          onClick={() => setActiveTab('overview')}
+          className={`pb-3 px-1 font-serif tracking-wider text-base transition flex items-center space-x-2 whitespace-nowrap ${
+            activeTab === 'overview'
+              ? 'border-b-2 border-stone-900 text-stone-950 font-semibold'
+              : 'text-stone-500 hover:text-stone-900'
+          }`}
+        >
+          <span>Overview</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('hdmi')}
+          className={`pb-3 px-1 font-serif tracking-wider text-base transition flex items-center space-x-2 whitespace-nowrap ${
+            activeTab === 'hdmi'
+              ? 'border-b-2 border-amber-500 text-stone-950 font-semibold'
+              : 'text-stone-500 hover:text-stone-900'
+          }`}
+        >
+          <Zap className="w-4 h-4 text-amber-500" />
+          <span>HDMI Live Capture</span>
+          <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold tracking-wider">
+            LIVE HUD
+          </span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('devices')}
+          className={`pb-3 px-1 font-serif tracking-wider text-base transition flex items-center space-x-2 whitespace-nowrap ${
+            activeTab === 'devices'
+              ? 'border-b-2 border-stone-900 text-stone-950 font-semibold'
+              : 'text-stone-500 hover:text-stone-900'
+          }`}
+        >
+          <span>Tethered Cameras</span>
+          <span className="px-2 py-0.5 rounded-full bg-stone-100 text-stone-800 text-[10px] font-bold">
+            {devices.length}
+          </span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('photos')}
+          className={`pb-3 px-1 font-serif tracking-wider text-base transition flex items-center space-x-2 whitespace-nowrap ${
+            activeTab === 'photos'
+              ? 'border-b-2 border-stone-900 text-stone-950 font-semibold'
+              : 'text-stone-500 hover:text-stone-900'
+          }`}
+        >
+          <span>Gallery Moderation</span>
+          <span className="px-2 py-0.5 rounded-full bg-stone-100 text-stone-800 text-[10px] font-bold">
+            {photos.length}
+          </span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('privacy')}
+          className={`pb-3 px-1 font-serif tracking-wider text-base transition flex items-center space-x-2 whitespace-nowrap ${
+            activeTab === 'privacy'
+              ? 'border-b-2 border-stone-900 text-stone-950 font-semibold'
+              : 'text-stone-500 hover:text-stone-900'
+          }`}
+        >
+          <Shield className="w-4 h-4 text-stone-600" />
+          <span>Privacy & Biometrics</span>
+        </button>
       </div>
 
-      {/* Tab: Camera Devices */}
+      {/* TAB 1: HDMI LIVE VIEWFINDER */}
+      {activeTab === 'hdmi' && (
+        <HdmiViewfinder
+          weddingSlug={weddingSlug}
+          adminToken={token}
+          onPhotoUploaded={() => {
+            if (token) loadDashboardData(token);
+          }}
+        />
+      )}
+
+      {/* TAB 2: OVERVIEW */}
+      {activeTab === 'overview' && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            {/* Quick Action Card: Connect via HDMI */}
+            <div className="p-6 rounded-3xl bg-gradient-to-br from-stone-900 to-[#2A2622] text-white border border-champagne/30 shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+              <div className="space-y-2">
+                <span className="px-2.5 py-0.5 rounded-full bg-amber-400 text-stone-950 text-[10px] font-bold tracking-widest uppercase">
+                  RECOMMENDED FOR WEDDINGS
+                </span>
+                <h3 className="font-serif text-2xl font-normal">HDMI Video Capture Live Feed</h3>
+                <p className="text-xs text-stone-300 max-w-lg leading-relaxed">
+                  Plug your camera HDMI cable into a USB Video Capture Card on this laptop. 
+                  View the real-time sensor feed and trigger candid photo uploads with spacebar or auto-timer.
+                </p>
+              </div>
+
+              <button
+                onClick={() => setActiveTab('hdmi')}
+                className="px-6 py-3 rounded-2xl bg-amber-400 hover:bg-amber-300 text-stone-950 text-xs font-bold tracking-widest uppercase transition shadow-lg shrink-0"
+              >
+                LAUNCH VIEWFINDER
+              </button>
+            </div>
+
+            {/* Hardware Quick-Start Cards */}
+            <div className="bg-white rounded-3xl p-6 border border-stone-200 shadow-sm space-y-4">
+              <h3 className="font-serif text-xl font-medium text-stone-900">Supported Photographer Connections</h3>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200 space-y-1.5">
+                  <div className="flex items-center space-x-2 text-stone-900 font-semibold text-xs">
+                    <Zap className="w-4 h-4 text-amber-600" />
+                    <span>1. HDMI Direct Cable</span>
+                  </div>
+                  <p className="text-[11px] text-stone-600 leading-relaxed">
+                    Camera Clean HDMI out &rarr; USB HDMI Capture Card (Cam Link). Zero software required on camera.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200 space-y-1.5">
+                  <div className="flex items-center space-x-2 text-stone-900 font-semibold text-xs">
+                    <Smartphone className="w-4 h-4 text-emerald-600" />
+                    <span>2. Android Mobile App</span>
+                  </div>
+                  <p className="text-[11px] text-stone-600 leading-relaxed">
+                    Install WedSnap APK on photographer Android phone. Background service syncs gallery in real-time.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200 space-y-1.5">
+                  <div className="flex items-center space-x-2 text-stone-900 font-semibold text-xs">
+                    <Camera className="w-4 h-4 text-stone-700" />
+                    <span>3. DSLR USB Tethering</span>
+                  </div>
+                  <p className="text-[11px] text-stone-600 leading-relaxed">
+                    Canon EOS Utility, Sony Imaging Edge, or Nikon NX Tether to a hot folder monitored by <code className="text-stone-800 font-mono">wedsnap_dslr.py</code>.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200 space-y-1.5">
+                  <div className="flex items-center space-x-2 text-stone-900 font-semibold text-xs">
+                    <Wifi className="w-4 h-4 text-sky-600" />
+                    <span>4. DSLR Wi-Fi FTP Direct</span>
+                  </div>
+                  <p className="text-[11px] text-stone-600 leading-relaxed">
+                    Camera transmits RAW/JPEG photos over Wi-Fi directly to WedSnap's background FTP receiver on port 2121.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* QR Code & Printable Sign Card */}
+          <div className="p-6 rounded-3xl bg-white border border-stone-200 shadow-sm flex flex-col items-center text-center space-y-5">
+            <h3 className="font-serif text-xl font-medium text-stone-900">Guest Access QR Display</h3>
+            <div className="p-3 bg-stone-50 rounded-2xl border border-stone-200 shadow-inner">
+              <img
+                src={api.getQRCodeUrl(weddingSlug)}
+                alt="Wedding QR"
+                className="w-44 h-44 p-2 bg-white rounded-xl shadow-sm"
+              />
+            </div>
+            <div className="space-y-1 text-xs text-stone-600">
+              <p className="font-semibold text-stone-900">Instant Guest Discovery</p>
+              <p>Display on welcome signage and dining tables so guests can browse photos and use AI facial search in real-time.</p>
+            </div>
+            <a
+              href={api.getTableCardUrl(weddingSlug)}
+              download={`WedSnap_Table_Card_${weddingSlug}.jpg`}
+              className="w-full py-3 rounded-2xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold tracking-wider uppercase transition shadow-md"
+            >
+              DOWNLOAD 5x7 TABLE CARD
+            </a>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 3: TETHERED CAMERAS */}
       {activeTab === 'devices' && (
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <h3 className="font-serif text-xl font-medium text-charcoal">Tethered Cameras & Connectors</h3>
-              <p className="text-xs text-charcoal-muted">
-                Android phones, DSLR hot folders, and Wi-Fi FTP camera streams
+              <h3 className="font-serif text-2xl font-normal text-stone-900">Tethered Cameras & Connectors</h3>
+              <p className="text-xs text-stone-600 mt-1">
+                Manage all paired photographer cameras, HDMI capture inputs, and Android mobile connectors
               </p>
             </div>
             <button
@@ -325,11 +577,12 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
                 setIsRegisteringDevice(true);
                 setNewlyCreatedToken(null);
                 setNewDeviceName('');
+                setNewDeviceType('hdmi_capture');
               }}
-              className="px-4 py-2 rounded-full bg-champagne text-white text-xs font-semibold tracking-wider hover:bg-champagne-hover transition flex items-center space-x-1.5 shadow"
+              className="px-5 py-2.5 rounded-full bg-gradient-to-r from-stone-900 to-stone-800 text-white text-xs font-semibold tracking-wider hover:brightness-110 transition flex items-center space-x-2 shadow-md"
             >
               <Plus className="w-4 h-4" />
-              <span>PAIR NEW CAMERA</span>
+              <span>PAIR NEW CAMERA DEVICE</span>
             </button>
           </div>
 
@@ -337,72 +590,97 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
             {devices.map((dev) => (
               <div
                 key={dev.id}
-                className="p-5 rounded-xl bg-cream/30 border border-cream-surface flex items-start justify-between"
+                className="p-6 rounded-3xl bg-white border border-stone-200 shadow-sm flex flex-col justify-between space-y-4 hover:border-champagne/60 transition"
               >
-                <div className="space-y-1.5">
-                  <div className="flex items-center space-x-2">
-                    {dev.device_type.includes('android') || dev.device_type.includes('usb') ? (
-                      <Smartphone className="w-4 h-4 text-champagne" />
-                    ) : (
-                      <Camera className="w-4 h-4 text-champagne" />
-                    )}
-                    <span className="font-medium text-charcoal text-sm">{dev.device_name}</span>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2.5">
+                      <div className="w-9 h-9 rounded-xl bg-stone-100 flex items-center justify-center text-stone-700">
+                        {dev.device_type === 'hdmi_capture' && <Zap className="w-5 h-5 text-amber-600" />}
+                        {dev.device_type === 'android_direct' && <Smartphone className="w-5 h-5 text-emerald-600" />}
+                        {dev.device_type === 'dslr_folder' && <Camera className="w-5 h-5 text-stone-700" />}
+                        {dev.device_type === 'dslr_ftp' && <Wifi className="w-5 h-5 text-sky-600" />}
+                        {dev.device_type === 'usb_adb' && <Usb className="w-5 h-5 text-purple-600" />}
+                      </div>
+                      <div>
+                        <span className="font-semibold text-stone-900 text-sm block">{dev.device_name}</span>
+                        <span className="text-[10px] text-stone-500 uppercase tracking-wider font-mono">
+                          {dev.device_type.replace('_', ' ')}
+                        </span>
+                      </div>
+                    </div>
+
                     <span
-                      className={`text-[10px] px-2 py-0.5 rounded-full uppercase font-bold tracking-wider ${
+                      className={`text-[10px] px-2.5 py-0.5 rounded-full uppercase font-bold tracking-wider ${
                         dev.authentication_status === 'active'
-                          ? 'bg-emerald-100 text-emerald-800'
-                          : 'bg-red-100 text-red-800'
+                          ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                          : 'bg-red-100 text-red-800 border border-red-300'
                       }`}
                     >
                       {dev.authentication_status}
                     </span>
                   </div>
 
-                  <p className="text-xs text-charcoal-muted">Type: {dev.device_type}</p>
-                  <p className="text-[11px] text-charcoal-muted">
-                    Photos Uploaded: <strong>{dev.photo_count}</strong>
-                  </p>
-                  {dev.last_seen && (
-                    <p className="text-[10px] text-charcoal-muted/70">
-                      Last seen: {new Date(dev.last_seen).toLocaleTimeString()}
+                  <div className="pt-2 text-xs text-stone-600 space-y-1">
+                    <p>
+                      Photos Streamed: <strong className="text-stone-900">{dev.photo_count}</strong>
                     </p>
-                  )}
+                    {dev.last_seen && (
+                      <p className="text-[11px] text-stone-500">
+                        Last seen: {new Date(dev.last_seen).toLocaleString()}
+                      </p>
+                    )}
+                  </div>
                 </div>
 
-                {dev.authentication_status === 'active' && (
-                  <button
-                    onClick={() => handleRevokeDevice(dev.id)}
-                    className="text-xs text-red-600 hover:text-red-800 font-medium"
-                  >
-                    Revoke Access
-                  </button>
-                )}
+                <div className="pt-3 border-t border-stone-100 flex items-center justify-between">
+                  {dev.device_type === 'hdmi_capture' && (
+                    <button
+                      onClick={() => setActiveTab('hdmi')}
+                      className="text-xs text-amber-700 hover:text-amber-800 font-semibold flex items-center space-x-1"
+                    >
+                      <Zap className="w-3.5 h-3.5" />
+                      <span>Open Live Viewfinder</span>
+                    </button>
+                  )}
+
+                  {dev.authentication_status === 'active' && (
+                    <button
+                      onClick={() => handleRevokeDevice(dev.id)}
+                      className="text-xs text-red-600 hover:text-red-800 font-medium ml-auto"
+                    >
+                      Revoke Device
+                    </button>
+                  )}
+                </div>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* Tab: Photo Management */}
+      {/* TAB 4: PHOTO MODERATION */}
       {activeTab === 'photos' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="font-serif text-xl font-medium text-charcoal">Gallery Photographs ({photos.length})</h3>
-            <p className="text-xs text-charcoal-muted">Click delete to remove any photograph immediately</p>
+            <div>
+              <h3 className="font-serif text-2xl font-normal text-stone-900">Gallery Photographs ({photos.length})</h3>
+              <p className="text-xs text-stone-600 mt-0.5">Click the trash icon on any photo to remove it immediately</p>
+            </div>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
             {photos.map((p) => (
-              <div key={p.id} className="relative group rounded-lg overflow-hidden bg-cream-surface aspect-[3/4]">
+              <div key={p.id} className="relative group rounded-2xl overflow-hidden bg-stone-100 aspect-[3/4] shadow-sm border border-stone-200">
                 <img src={api.getThumbnailUrl(p.id)} alt={p.original_filename} className="w-full h-full object-cover" />
                 <button
                   onClick={() => handleDeletePhoto(p.id)}
-                  className="absolute top-2 right-2 p-1.5 rounded-full bg-red-600 text-white opacity-0 group-hover:opacity-100 transition shadow hover:bg-red-700"
+                  className="absolute top-2 right-2 p-2 rounded-full bg-red-600 text-white opacity-0 group-hover:opacity-100 transition shadow hover:bg-red-700"
                   title="Delete Photo"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
-                <div className="absolute bottom-0 inset-x-0 p-2 bg-black/60 text-[10px] text-white truncate font-mono opacity-0 group-hover:opacity-100 transition">
+                <div className="absolute bottom-0 inset-x-0 p-2.5 bg-gradient-to-t from-black/80 to-transparent text-[10px] text-white truncate font-mono opacity-0 group-hover:opacity-100 transition">
                   {p.original_filename}
                 </div>
               </div>
@@ -411,27 +689,27 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
         </div>
       )}
 
-      {/* Tab: Privacy & Biometrics */}
+      {/* TAB 5: PRIVACY & BIOMETRIC CONTROLS */}
       {activeTab === 'privacy' && wedding && (
-        <div className="max-w-2xl bg-cream/30 border border-cream-surface rounded-xl p-6 space-y-6">
+        <div className="max-w-2xl bg-white border border-stone-200 rounded-3xl p-8 space-y-6 shadow-sm">
           <div>
-            <h3 className="font-serif text-xl font-medium text-charcoal">Privacy & Biometric Controls</h3>
-            <p className="text-xs text-charcoal-muted mt-1">
-              Admin controls for wedding guest data and AI facial recognition features
+            <h3 className="font-serif text-2xl font-normal text-stone-900">Privacy & Biometric Controls</h3>
+            <p className="text-xs text-stone-600 mt-1">
+              Data governance, guest consent, and AI facial recognition management
             </p>
           </div>
 
-          <div className="flex items-center justify-between py-3 border-y border-cream-surface">
+          <div className="flex items-center justify-between py-4 border-y border-stone-100">
             <div>
-              <p className="text-sm font-medium text-charcoal">Find My Photos (Facial Recognition)</p>
-              <p className="text-xs text-charcoal-muted">Allow guests to discover their photos via selfie search</p>
+              <p className="text-sm font-semibold text-stone-900">Find My Photos (Facial Recognition)</p>
+              <p className="text-xs text-stone-600">Allow guests to discover their photos via selfie search</p>
             </div>
             <button
               onClick={handleToggleFaceSearch}
-              className={`px-4 py-1.5 rounded-full text-xs font-semibold transition ${
+              className={`px-5 py-2 rounded-full text-xs font-bold tracking-wider transition ${
                 wedding.face_search_enabled
                   ? 'bg-emerald-600 text-white'
-                  : 'bg-cream-surface text-charcoal-muted'
+                  : 'bg-stone-200 text-stone-700'
               }`}
             >
               {wedding.face_search_enabled ? 'ENABLED' : 'DISABLED'}
@@ -439,8 +717,8 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
           </div>
 
           <div className="space-y-3">
-            <h4 className="text-sm font-medium text-charcoal">Purge All Biometric Embeddings</h4>
-            <p className="text-xs text-charcoal-muted leading-relaxed">
+            <h4 className="text-sm font-semibold text-stone-900">Purge All Biometric Embeddings</h4>
+            <p className="text-xs text-stone-600 leading-relaxed">
               Permanently purges all computed facial embeddings for this wedding from database storage. This immediately destroys all biometric index records.
             </p>
             <button
@@ -453,123 +731,129 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
         </div>
       )}
 
-      {/* Tab: Overview & Quick Pairing */}
-      {activeTab === 'overview' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="p-6 rounded-xl bg-cream/30 border border-cream-surface space-y-4">
-            <h3 className="font-serif text-xl font-medium text-charcoal">How to Connect Cameras</h3>
-            <div className="space-y-3 text-xs text-charcoal/80 leading-relaxed">
-              <p>
-                <strong>1. Android Mobile App:</strong> Enter this server URL and pair using a Device Token. Shoot photos with camera; new photos sync to the gallery instantly.
-              </p>
-              <p>
-                <strong>2. DSLR USB Tethering:</strong> Connect Canon, Sony, or Nikon to laptop. Launch tethering software into a hot folder. Start <code className="bg-cream-surface px-1.5 py-0.5 rounded">python wedsnap_dslr.py</code>.
-              </p>
-              <p>
-                <strong>3. Wi-Fi FTP Direct:</strong> In camera Wi-Fi settings, set FTP server to laptop IP on port 2121. Every click transmits wirelessly straight to WedSnap.
-              </p>
-            </div>
-          </div>
-
-          <div className="p-6 rounded-xl bg-cream/30 border border-cream-surface flex flex-col items-center text-center space-y-4">
-            <h3 className="font-serif text-xl font-medium text-charcoal">Guest Access QR Display</h3>
-            <img
-              src={api.getQRCodeUrl(weddingSlug)}
-              alt="Wedding QR"
-              className="w-40 h-40 p-2 bg-white rounded-lg border border-cream-surface"
-            />
-            <p className="text-xs text-charcoal-muted">
-              Display this on welcome signs and dining tables so guests can view photos and find their moments in real-time.
-            </p>
-            <a
-              href={api.getTableCardUrl(weddingSlug)}
-              download={`WedSnap_Table_Card_${weddingSlug}.jpg`}
-              className="px-5 py-2.5 rounded-full bg-champagne text-white text-xs font-bold tracking-wider uppercase hover:bg-champagne-hover transition shadow"
-            >
-              DOWNLOAD 5x7 PRINTABLE TABLE CARD
-            </a>
-          </div>
-        </div>
-      )}
-
-      {/* Register Device Dialog */}
+      {/* BESPOKE LUXURY MODAL: Pair Photographer Device */}
       {isRegisteringDevice && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-ivory border border-cream-surface rounded-2xl max-w-md w-full p-6 space-y-5 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-cream-surface pb-3">
-              <h3 className="font-serif text-lg font-medium text-charcoal">Pair Photographer Device</h3>
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
+          <div className="bg-white border border-stone-200 rounded-3xl max-w-lg w-full p-6 sm:p-8 space-y-6 shadow-2xl my-8">
+            <div className="flex items-center justify-between border-b border-stone-100 pb-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-xl bg-champagne-light text-stone-900 flex items-center justify-center">
+                  <Camera className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-serif text-xl font-normal text-stone-900">Pair Photographer Camera</h3>
+                  <p className="text-[11px] text-stone-500">Generate secure credentials for real-time streaming</p>
+                </div>
+              </div>
               <button
                 onClick={() => setIsRegisteringDevice(false)}
-                className="text-charcoal-muted hover:text-charcoal"
+                className="text-stone-400 hover:text-stone-900 p-1 rounded-lg transition"
               >
                 ✕
               </button>
             </div>
 
             {!newlyCreatedToken ? (
-              <div className="space-y-4">
+              <div className="space-y-5">
                 <div>
-                  <label className="text-xs font-medium text-charcoal block mb-1">Device Name</label>
+                  <label className="text-xs font-semibold text-stone-700 block mb-1.5">Camera / Device Name</label>
                   <input
                     type="text"
-                    placeholder="e.g. Sony A7 IV - Lead Photographer"
+                    placeholder="e.g. Sony A7 IV - HDMI Clean Feed"
                     value={newDeviceName}
                     onChange={(e) => setNewDeviceName(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg border border-cream-surface bg-white text-xs text-charcoal"
+                    className="w-full px-4 py-2.5 rounded-xl border border-stone-200 bg-stone-50 text-stone-900 text-xs focus:ring-2 focus:ring-champagne focus:bg-white focus:outline-none transition"
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs font-medium text-charcoal block mb-1">Connection Method</label>
-                  <select
-                    value={newDeviceType}
-                    onChange={(e) => setNewDeviceType(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg border border-cream-surface bg-white text-xs text-charcoal"
-                  >
-                    <option value="dslr_folder">DSLR Folder Monitor (Canon EOS / Sony / Nikon)</option>
-                    <option value="dslr_ftp">DSLR Wi-Fi FTP Direct Transfer</option>
-                    <option value="android_direct">Android Mobile Application (Direct Cloud)</option>
-                    <option value="usb_adb">USB Laptop ADB Connector</option>
-                  </select>
+                  <label className="text-xs font-semibold text-stone-700 block mb-2">Connection Method</label>
+                  
+                  {/* Interactive Connection Method Cards */}
+                  <div className="space-y-2.5 max-h-[320px] overflow-y-auto pr-1">
+                    {connectionOptions.map((opt) => (
+                      <div
+                        key={opt.id}
+                        onClick={() => setNewDeviceType(opt.id as any)}
+                        className={`p-3.5 rounded-2xl border text-left cursor-pointer transition flex items-start space-x-3 ${
+                          newDeviceType === opt.id
+                            ? 'border-champagne bg-champagne-light/30 ring-2 ring-champagne/40'
+                            : 'border-stone-200 bg-stone-50/60 hover:bg-stone-50 hover:border-stone-300'
+                        }`}
+                      >
+                        <div className="p-2 rounded-xl bg-white border border-stone-200 shadow-sm shrink-0 mt-0.5">
+                          {opt.icon}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="font-semibold text-stone-900 text-xs">{opt.title}</span>
+                            <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider border ${opt.badgeColor}`}>
+                              {opt.badge}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-stone-500 mt-0.5 leading-snug">{opt.description}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
                 <button
                   onClick={handleRegisterDevice}
-                  className="w-full py-2.5 rounded-xl bg-champagne text-white text-xs font-bold tracking-wider uppercase hover:bg-champagne-hover transition"
+                  className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-[#D4AF37] via-[#C5A880] to-[#B5966B] hover:brightness-105 text-stone-950 text-xs font-bold tracking-widest uppercase transition shadow-lg"
                 >
                   GENERATE DEVICE CREDENTIALS
                 </button>
               </div>
             ) : (
-              <div className="space-y-4 text-center">
-                <p className="text-xs text-charcoal-muted">
-                  Device registered successfully! Copy this API token into your camera connector config:
-                </p>
+              <div className="space-y-5 text-center">
+                <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto border border-emerald-200">
+                  <CheckCircle2 className="w-6 h-6" />
+                </div>
 
-                <div className="p-3 bg-white rounded-lg border border-cream-surface font-mono text-xs text-charcoal break-all select-all flex items-center justify-between">
-                  <span>{newlyCreatedToken}</span>
+                <div className="space-y-1">
+                  <h4 className="font-serif text-lg font-medium text-stone-900">Device Ready to Stream!</h4>
+                  <p className="text-xs text-stone-600">
+                    Use this dedicated token to authenticate uploads from your camera or connector script:
+                  </p>
+                </div>
+
+                <div className="p-3 bg-stone-50 rounded-xl border border-stone-200 font-mono text-xs text-stone-900 break-all select-all flex items-center justify-between">
+                  <span className="text-[11px] text-left">{newlyCreatedToken}</span>
                   <button
                     onClick={() => {
                       navigator.clipboard.writeText(newlyCreatedToken);
                       setCopiedToken(true);
                       setTimeout(() => setCopiedToken(false), 2000);
                     }}
-                    className="ml-2 p-1.5 text-champagne hover:text-champagne-hover"
+                    className="ml-2 p-2 bg-white rounded-lg border border-stone-200 hover:bg-stone-50 text-stone-700 transition"
+                    title="Copy Token"
                   >
                     {copiedToken ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
                   </button>
                 </div>
 
-                <p className="text-[11px] text-charcoal-muted">
-                  Set this in <code className="bg-cream-surface px-1 py-0.5 rounded">config.ini</code> or paste into the Android app.
-                </p>
-
-                <button
-                  onClick={() => setIsRegisteringDevice(false)}
-                  className="w-full py-2 rounded-xl bg-charcoal text-white text-xs font-medium"
-                >
-                  DONE
-                </button>
+                {newDeviceType === 'hdmi_capture' ? (
+                  <div className="space-y-3 pt-2">
+                    <button
+                      onClick={() => {
+                        setIsRegisteringDevice(false);
+                        setActiveTab('hdmi');
+                      }}
+                      className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-bold text-xs tracking-wider uppercase transition shadow-md flex items-center justify-center space-x-2"
+                    >
+                      <Zap className="w-4 h-4 fill-current" />
+                      <span>OPEN HDMI LIVE VIEWFINDER NOW</span>
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setIsRegisteringDevice(false)}
+                    className="w-full py-3 rounded-2xl bg-stone-900 text-white text-xs font-bold tracking-wider uppercase"
+                  >
+                    DONE
+                  </button>
+                )}
               </div>
             )}
           </div>

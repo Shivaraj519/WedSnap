@@ -43,7 +43,7 @@ export interface Device {
   id: string;
   wedding_id: string;
   device_name: string;
-  device_type: 'android_direct' | 'usb_adb' | 'dslr_folder' | 'dslr_ftp' | 'manual_web';
+  device_type: 'android_direct' | 'usb_adb' | 'dslr_folder' | 'dslr_ftp' | 'manual_web' | 'hdmi_capture';
   authentication_status: 'active' | 'revoked';
   last_seen?: string;
   created_at: string;
