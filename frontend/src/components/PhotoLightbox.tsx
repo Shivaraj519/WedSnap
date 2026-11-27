@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { X, ChevronLeft, ChevronRight, Download, Camera, Info, Calendar, ShieldCheck } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Download, Camera, Info, Calendar, ShieldCheck, Trash2 } from 'lucide-react';
 import { Photo } from '../types';
 import { api } from '../services/api';
 
@@ -8,6 +8,7 @@ interface PhotoLightboxProps {
   photos: Photo[];
   onClose: () => void;
   onNavigate: (newPhoto: Photo) => void;
+  onPhotoDeleted?: (photoId: string) => void;
 }
 
 export const PhotoLightbox: React.FC<PhotoLightboxProps> = ({
@@ -15,9 +16,16 @@ export const PhotoLightbox: React.FC<PhotoLightboxProps> = ({
   photos,
   onClose,
   onNavigate,
+  onPhotoDeleted,
 }) => {
   const [showExif, setShowExif] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // Check if admin token is available in local storage
+  const adminToken = 
+    localStorage.getItem('admin_token_vinutha-mayuresh') || 
+    localStorage.getItem('admin_token_sophia-alexander');
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -73,6 +81,29 @@ export const PhotoLightbox: React.FC<PhotoLightboxProps> = ({
         </div>
 
         <div className="flex items-center space-x-3">
+          {adminToken && (
+            <button
+              disabled={isDeleting}
+              onClick={async () => {
+                if (!confirm('Are you sure you want to permanently delete this photo from the gallery?')) return;
+                setIsDeleting(true);
+                try {
+                  await api.deletePhoto(photo.id, adminToken);
+                  if (onPhotoDeleted) onPhotoDeleted(photo.id);
+                  onClose();
+                } catch (err: any) {
+                  alert('Delete failed: ' + err.message);
+                } finally {
+                  setIsDeleting(false);
+                }
+              }}
+              className="p-2 rounded-full hover:bg-red-500/20 text-red-400 hover:text-red-300 transition"
+              title="Delete Photo (Admin)"
+            >
+              <Trash2 className="w-5 h-5" />
+            </button>
+          )}
+
           <button
             onClick={() => setShowExif(!showExif)}
             className={`p-2 rounded-full transition ${

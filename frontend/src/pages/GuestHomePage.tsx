@@ -188,6 +188,26 @@ export const GuestHomePage: React.FC<GuestHomePageProps> = ({
           </p>
         )}
 
+        {/* Featured Wedding Couple Portrait */}
+        <div className="pt-4 pb-2 flex justify-center">
+          <div className="relative group max-w-sm sm:max-w-md w-full rounded-3xl p-2.5 bg-gradient-to-br from-[#FED7AA] via-white to-[#FDBA74] border-2 border-orange-300 shadow-2xl transition-all duration-300 hover:scale-[1.01] hover:shadow-orange-500/20">
+            <div className="relative rounded-2xl overflow-hidden aspect-[4/5] bg-stone-100 shadow-inner">
+              <img
+                src="/hero_couple.jpg"
+                alt="Vinutha B.S. & Mayuresh C.Noola"
+                className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-stone-950/80 via-transparent to-transparent flex items-end p-5 text-left">
+                <div>
+                  <span className="text-[10px] uppercase font-bold tracking-widest text-orange-300 block">Wedding Portrait</span>
+                  <p className="font-serif text-2xl text-white font-normal">Vinutha & Mayuresh</p>
+                  <p className="text-[11px] text-stone-300 font-sans mt-0.5">Every moment captured live & shared instantly</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Primary Call to Action Buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-6">
           {wedding.face_search_enabled && (
@@ -312,6 +332,14 @@ export const GuestHomePage: React.FC<GuestHomePageProps> = ({
           photos={photos}
           onClose={() => setActiveLightboxPhoto(null)}
           onNavigate={(p) => setActiveLightboxPhoto(p)}
+          onPhotoDeleted={(deletedId) => {
+            setPhotos((prev) => prev.filter((p) => p.id !== deletedId));
+            setSelectedPhotoIds((prev) => {
+              const next = new Set(prev);
+              next.delete(deletedId);
+              return next;
+            });
+          }}
         />
       )}
 
