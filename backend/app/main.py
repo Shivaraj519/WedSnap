@@ -71,6 +71,25 @@ def startup_seed_demo():
                 wedding.venue = "Palace Grounds, Bangalore"
             db.commit()
             logger.info("Wedding names updated to Vinutha B.S. & Mayuresh C.Noola")
+
+        # 2. Seed and preserve default paired Android phone token
+        from app.models.models import Device
+        from app.security.tokens import hash_device_token
+        default_token = "wds_zhV7WIuUlJhSEM8yTwLgzJprpYFNsBe61g8cMUTXuD8"
+        token_hash = hash_device_token(default_token)
+        dev = db.query(Device).filter(Device.api_token_hash == token_hash).first()
+        if not dev:
+            dev = Device(
+                id="wds-default-android-phone",
+                wedding_id=wedding.id,
+                device_name="Photographer Android Phone",
+                device_type="android_direct",
+                api_token_hash=token_hash,
+                authentication_status="active"
+            )
+            db.add(dev)
+            db.commit()
+            logger.info("Default photographer Android phone seeded with active token")
     except Exception as e:
         logger.error(f"Startup check failed: {e}")
     finally:
