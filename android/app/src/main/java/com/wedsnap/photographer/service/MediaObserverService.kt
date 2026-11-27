@@ -119,12 +119,13 @@ class MediaObserverService : Service() {
 
         val uploadWork = OneTimeWorkRequestBuilder<PhotoUploadWorker>()
             .setConstraints(constraints)
-            .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 10, java.util.concurrent.TimeUnit.SECONDS)
+            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+            .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 5, java.util.concurrent.TimeUnit.SECONDS)
             .build()
 
         WorkManager.getInstance(applicationContext).enqueueUniqueWork(
             "WedSnapPhotoUpload",
-            ExistingWorkPolicy.APPEND_OR_REPLACE,
+            ExistingWorkPolicy.REPLACE,
             uploadWork
         )
     }

@@ -30,9 +30,9 @@ class PhotoUploadWorker(
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         val prefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(appContext)
-        val serverUrl = prefs.getString("server_url", "http://10.0.2.2:8000/") ?: "http://10.0.2.2:8000/"
-        val deviceToken = prefs.getString("device_token", "") ?: ""
-        val weddingSlug = prefs.getString("wedding_slug", "") ?: ""
+        val serverUrl = prefs.getString("server_url", "https://wedsnap-1.onrender.com")?.takeIf { it.isNotBlank() } ?: "https://wedsnap-1.onrender.com"
+        val deviceToken = prefs.getString("device_token", "wds_zhV7WIuUlJhSEM8yTwLgzJprpYFNsBe61g8cMUTXuD8")?.takeIf { it.isNotBlank() } ?: "wds_zhV7WIuUlJhSEM8yTwLgzJprpYFNsBe61g8cMUTXuD8"
+        val weddingSlug = prefs.getString("wedding_slug", "vinutha-mayuresh")?.takeIf { it.isNotBlank() } ?: "vinutha-mayuresh"
 
         if (deviceToken.isBlank() || weddingSlug.isBlank()) {
             Log.w("WedSnapWorker", "Missing pairing credentials. Worker deferred.")

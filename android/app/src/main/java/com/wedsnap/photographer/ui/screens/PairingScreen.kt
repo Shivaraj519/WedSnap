@@ -24,9 +24,9 @@ fun PairingScreen(onPaired: () -> Unit) {
     val context = LocalContext.current
     val prefs = remember { PreferenceManager.getDefaultSharedPreferences(context) }
 
-    var serverUrl by remember { mutableStateOf(prefs.getString("server_url", "https://wedsnap-backend.onrender.com") ?: "") }
-    var weddingSlug by remember { mutableStateOf(prefs.getString("wedding_slug", "sophia-alexander") ?: "") }
-    var deviceToken by remember { mutableStateOf(prefs.getString("device_token", "") ?: "") }
+    var serverUrl by remember { mutableStateOf(prefs.getString("server_url", "https://wedsnap-1.onrender.com")?.takeIf { it.isNotBlank() } ?: "https://wedsnap-1.onrender.com") }
+    var weddingSlug by remember { mutableStateOf(prefs.getString("wedding_slug", "vinutha-mayuresh")?.takeIf { it.isNotBlank() } ?: "vinutha-mayuresh") }
+    var deviceToken by remember { mutableStateOf(prefs.getString("device_token", "wds_zhV7WIuUlJhSEM8yTwLgzJprpYFNsBe61g8cMUTXuD8")?.takeIf { it.isNotBlank() } ?: "wds_zhV7WIuUlJhSEM8yTwLgzJprpYFNsBe61g8cMUTXuD8") }
 
     Column(
         modifier = Modifier
