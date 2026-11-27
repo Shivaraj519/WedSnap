@@ -25,4 +25,13 @@ interface PhotoDao {
 
     @Query("DELETE FROM photo_queue WHERE uploadStatus = 'COMPLETED'")
     suspend fun clearCompleted()
+
+    @Query("DELETE FROM photo_queue WHERE uploadStatus != 'COMPLETED'")
+    suspend fun clearPendingQueue()
+
+    @Query("DELETE FROM photo_queue WHERE uri = :uri")
+    suspend fun deleteByUri(uri: String)
+
+    @Query("DELETE FROM photo_queue")
+    suspend fun clearAll()
 }

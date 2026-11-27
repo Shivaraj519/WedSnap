@@ -24,7 +24,10 @@ fun PairingScreen(onPaired: () -> Unit) {
     val context = LocalContext.current
     val prefs = remember { PreferenceManager.getDefaultSharedPreferences(context) }
 
-    var serverUrl by remember { mutableStateOf(prefs.getString("server_url", "https://wedsnap-1.onrender.com")?.takeIf { it.isNotBlank() } ?: "https://wedsnap-1.onrender.com") }
+    var serverUrl by remember {
+        val saved = prefs.getString("server_url", "https://wedsnap-1.onrender.com")
+        mutableStateOf(if (saved.isNullOrBlank() || saved.contains("wedsnap-backend")) "https://wedsnap-1.onrender.com" else saved)
+    }
     var weddingSlug by remember { mutableStateOf(prefs.getString("wedding_slug", "vinutha-mayuresh")?.takeIf { it.isNotBlank() } ?: "vinutha-mayuresh") }
     var deviceToken by remember { mutableStateOf(prefs.getString("device_token", "wds_zhV7WIuUlJhSEM8yTwLgzJprpYFNsBe61g8cMUTXuD8")?.takeIf { it.isNotBlank() } ?: "wds_zhV7WIuUlJhSEM8yTwLgzJprpYFNsBe61g8cMUTXuD8") }
 
@@ -118,6 +121,23 @@ fun PairingScreen(onPaired: () -> Unit) {
                         color = Color.White,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 1.sp
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                TextButton(
+                    onClick = {
+                        serverUrl = "https://wedsnap-1.onrender.com"
+                        weddingSlug = "vinutha-mayuresh"
+                        deviceToken = "wds_zhV7WIuUlJhSEM8yTwLgzJprpYFNsBe61g8cMUTXuD8"
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Reset to Recommended Cloud Defaults",
+                        color = ChampagneGold,
+                        fontSize = 12.sp
                     )
                 }
             }

@@ -1,3 +1,4 @@
+import os
 import logging
 from datetime import datetime, date
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends
@@ -7,10 +8,11 @@ from sqlalchemy.orm import Session
 
 from app.config import settings
 from app.database.session import Base, engine, get_db
-from app.models.models import Wedding
+from app.models.models import Wedding, Device, Photo
+from app.services.upload_service import upload_service
 from app.api import api_router
 from app.websocket.manager import ws_manager
-from app.security.tokens import hash_password
+from app.security.tokens import hash_password, hash_device_token
 
 logging.basicConfig(
     level=logging.INFO,
@@ -41,8 +43,8 @@ app.add_middleware(
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
 @app.on_event("startup")
-def startup_seed_demo():
-    """Ensure Vinutha B.S. & Mayuresh C.Noola wedding exists for seamless live testing."""
+async def startup_seed_demo():
+    """Ensure Vinutha B.S. & Mayuresh C.Noola wedding exists and photos are permanently preserved."""
     db = next(get_db())
     try:
         # 1. Update or create wedding with Vinutha B.S. and Mayuresh C.Noola
@@ -73,8 +75,6 @@ def startup_seed_demo():
             logger.info("Wedding names updated to Vinutha B.S. & Mayuresh C.Noola")
 
         # 2. Seed and preserve default paired Android phone token
-        from app.models.models import Device
-        from app.security.tokens import hash_device_token
         default_token = "wds_zhV7WIuUlJhSEM8yTwLgzJprpYFNsBe61g8cMUTXuD8"
         token_hash = hash_device_token(default_token)
         dev = db.query(Device).filter(Device.api_token_hash == token_hash).first()
@@ -90,6 +90,29 @@ def startup_seed_demo():
             db.add(dev)
             db.commit()
             logger.info("Default photographer Android phone seeded with active token")
+
+        # 3. Seed genuine wedding photographs so the gallery is never wiped on cloud restarts
+        photo_count = db.query(Photo).filter(Photo.wedding_id == wedding.id).count()
+        if photo_count == 0:
+            seed_dir = os.path.join(os.path.dirname(__file__), "seed_photos")
+            if os.path.exists(seed_dir):
+                for fname in sorted(os.listdir(seed_dir)):
+                    fpath = os.path.join(seed_dir, fname)
+                    if os.path.isfile(fpath) and fname.lower().endswith(('.jpg', '.jpeg', '.png')):
+                        with open(fpath, "rb") as f:
+                            data = f.read()
+                        try:
+                            await upload_service.process_and_store_photo(
+                                db=db,
+                                wedding_id=wedding.id,
+                                file_bytes=data,
+                                filename=fname,
+                                mime_type="image/jpeg",
+                                source_device_id=dev.id if dev else None
+                            )
+                            logger.info(f"Permanently seeded wedding photograph: {fname}")
+                        except Exception as p_err:
+                            logger.warning(f"Could not seed photo {fname}: {p_err}")
     except Exception as e:
         logger.error(f"Startup check failed: {e}")
     finally:

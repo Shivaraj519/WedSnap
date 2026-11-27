@@ -81,7 +81,7 @@ class PhotoUploadWorker(
                 val uri = Uri.parse(photo.uri)
                 val stream: InputStream? = appContext.contentResolver.openInputStream(uri)
                 if (stream == null) {
-                    db.photoDao().updateStatus(photo.uri, UploadStatus.FAILED, "File not accessible")
+                    db.photoDao().deleteByUri(photo.uri)
                     continue
                 }
 

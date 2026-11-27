@@ -39,7 +39,6 @@ fun StatusScreen(onUnpair: () -> Unit) {
     var continuousMode by remember { mutableStateOf(true) }
 
     val completedCount by db.photoDao().getCompletedCountFlow().collectAsState(initial = 0)
-    val pendingCount by db.photoDao().getPendingCountFlow().collectAsState(initial = 0)
 
     Column(
         modifier = Modifier
@@ -91,7 +90,7 @@ fun StatusScreen(onUnpair: () -> Unit) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(24.dp),
+                    .padding(28.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Row(
@@ -118,47 +117,25 @@ fun StatusScreen(onUnpair: () -> Unit) {
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Metric Counters
-                Row(
+                // Verified Synced Photos Counter (Accurate Genuine Count Only)
+                Column(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = "$completedCount",
-                            fontSize = 38.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = ChampagneGold
-                        )
-                        Text(
-                            text = "PHOTOS SYNCED",
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = DarkCharcoal.copy(alpha = 0.6f)
-                        )
-                    }
-
-                    Box(
-                        modifier = Modifier
-                            .width(1.dp)
-                            .height(50.dp)
-                            .background(Color(0xFFE0E0E0))
+                    Text(
+                        text = "$completedCount",
+                        fontSize = 52.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = ChampagneGold
                     )
-
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = "$pendingCount",
-                            fontSize = 38.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = if (pendingCount > 0) Color(0xFFE91E63) else DarkCharcoal
-                        )
-                        Text(
-                            text = "IN QUEUE",
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = DarkCharcoal.copy(alpha = 0.6f)
-                        )
-                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "PHOTOS SYNCED TO WEDDING GALLERY",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = DarkCharcoal.copy(alpha = 0.7f),
+                        letterSpacing = 1.sp
+                    )
                 }
             }
         }

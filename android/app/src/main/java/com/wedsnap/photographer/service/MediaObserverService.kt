@@ -31,6 +31,14 @@ class MediaObserverService : Service() {
         super.onCreate()
         // Record baseline timestamp so existing camera roll photos are NOT uploaded
         sessionActivationTimestamp = System.currentTimeMillis() / 1000L
+        // Clear any stale unverified queue items
+        serviceScope.launch {
+            try {
+                WedSnapDatabase.getDatabase(applicationContext).photoDao().clearPendingQueue()
+            } catch (e: Exception) {
+                Log.w("WedSnapService", "Could not clear stale queue: ${e.message}")
+            }
+        }
         createNotificationChannel()
         startForeground(NOTIFICATION_ID, createNotification("Monitoring camera for new photos..."))
         registerMediaObserver()
@@ -56,12 +64,18 @@ class MediaObserverService : Service() {
 
     private fun scanNewPhotos(db: WedSnapDatabase) {
         serviceScope.launch {
-            val projection = arrayOf(
+            val projection = mutableListOf(
                 MediaStore.Images.Media._ID,
                 MediaStore.Images.Media.DISPLAY_NAME,
                 MediaStore.Images.Media.SIZE,
-                MediaStore.Images.Media.DATE_ADDED
+                MediaStore.Images.Media.DATE_ADDED,
+                MediaStore.Images.Media.DATA
             )
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                projection.add(MediaStore.Images.Media.RELATIVE_PATH)
+                projection.add(MediaStore.Images.Media.IS_PENDING)
+            }
+
             // Query only photos taken AFTER session activation
             val selection = "${MediaStore.Images.Media.DATE_ADDED} >= ?"
             val selectionArgs = arrayOf(sessionActivationTimestamp.toString())
@@ -69,7 +83,7 @@ class MediaObserverService : Service() {
 
             contentResolver.query(
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                projection,
+                projection.toTypedArray(),
                 selection,
                 selectionArgs,
                 sortOrder
@@ -78,13 +92,44 @@ class MediaObserverService : Service() {
                 val nameCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
                 val sizeCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE)
                 val dateCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_ADDED)
+                val dataCol = cursor.getColumnIndex(MediaStore.Images.Media.DATA)
+                val relPathCol = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    cursor.getColumnIndex(MediaStore.Images.Media.RELATIVE_PATH)
+                } else -1
+                val isPendingCol = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    cursor.getColumnIndex(MediaStore.Images.Media.IS_PENDING)
+                } else -1
 
                 var newFound = false
                 while (cursor.moveToNext()) {
+                    // Skip if file write is still pending by camera
+                    if (isPendingCol != -1 && cursor.getInt(isPendingCol) != 0) {
+                        continue
+                    }
+
                     val id = cursor.getLong(idCol)
-                    val name = cursor.getString(nameCol) ?: "camera_photo.jpg"
+                    val name = cursor.getString(nameCol) ?: ""
                     val size = cursor.getLong(sizeCol)
                     val dateAdded = cursor.getLong(dateCol)
+                    val dataPath = if (dataCol != -1) cursor.getString(dataCol) ?: "" else ""
+                    val relPath = if (relPathCol != -1) cursor.getString(relPathCol) ?: "" else ""
+
+                    // Strict validation: Only real camera captures (no screenshots, thumbnails, or temp files)
+                    val lowerName = name.lowercase()
+                    val pathCombined = (relPath + "/" + dataPath).lowercase()
+                    val isCameraFolder = pathCombined.contains("dcim") || pathCombined.contains("camera")
+                    val isPhotoExtension = lowerName.endsWith(".jpg") || lowerName.endsWith(".jpeg") ||
+                            lowerName.endsWith(".png") || lowerName.endsWith(".heic") || lowerName.endsWith(".dng")
+                    val isNotHiddenOrTemp = !lowerName.startsWith(".") && 
+                            !lowerName.contains("thumb") && 
+                            !lowerName.contains("cache") && 
+                            !lowerName.contains("temp") &&
+                            !lowerName.contains("screenshot")
+
+                    // Ignore tiny files, non-camera media, and temporary cache
+                    if (!isCameraFolder || !isPhotoExtension || !isNotHiddenOrTemp || size < 100_000) {
+                        continue
+                    }
 
                     val contentUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
                     val checksum = ChecksumUtils.calculateSha256(applicationContext, contentUri)
@@ -100,7 +145,7 @@ class MediaObserverService : Service() {
                         val rowId = db.photoDao().insert(photo)
                         if (rowId != -1L) {
                             newFound = true
-                            Log.i("WedSnapService", "Detected new wedding capture: $name ($size bytes)")
+                            Log.i("WedSnapService", "Genuine camera capture verified: $name ($size bytes)")
                         }
                     }
                 }
